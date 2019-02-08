@@ -1,0 +1,47 @@
+{
+  "name": "dgraph-orm",
+  "version": "0.0.1",
+  "description": "An ORM for Dgraph",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "babel src --optional runtime --out-dir lib/",
+    "start": "npm run prepare && nodemon example --exec babel-node"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ashokvishwakarma/dgraph-orm.git"
+  },
+  "keywords": [
+    "dgraph-orm",
+    "dgraph-schema"
+  ],
+  "author": "Ashok Vishwakarma <akvlko@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ashokvishwakarma/dgraph-orm/issues"
+  },
+  "homepage": "https://github.com/ashokvishwakarma/dgraph-orm#readme",
+  "devDependencies": {
+    "nodemon": "^1.18.9",
+    "babel-cli": "^6.24.1",
+    "babel-eslint": "^8.0.3",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-flow": "^6.23.0",
+    "babel-preset-stage-0": "^6.24.1"
+  },
+  "dependencies": {
+    "dgraph-js": "^1.2.1",
+    "grpc": "^1.18.0"
+  },
+  "babel": {
+    "presets": [
+      "env",
+      "stage-0"
+    ],
+    "plugins": [
+      "transform-runtime"
+    ]
+  }
+}
