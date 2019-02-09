@@ -1,7 +1,7 @@
 const { prepareSchema, checkOptions } = require('./helpers/utility');
 
 class Schema {
-  constructor(name, schema, options) {
+  constructor(name, schema) {
     this._schema = [];
 
     this._generate(name, schema);
@@ -9,8 +9,7 @@ class Schema {
     return {
       name,
       schema: this._schema,
-      original: schema,
-      options
+      original: schema
     }
   }
 

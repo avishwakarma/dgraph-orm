@@ -16,7 +16,6 @@ class DgraphSchema {
   }
 
   async _set_model(schema) {
-    console.log(schema.schema);
     if(typeof this._models[schema.name] === 'undefined') {
       this._models[schema.name] = true;
       const op = new this.connection.Operation();
@@ -30,10 +29,10 @@ class DgraphSchema {
   }
 
   model(schema) {
+    this._models[schema.name] = schema.original;
     this._set_model(schema);
 
     return {
-      schema,
       query: this.query.bind(this),
       mutate: this.mutate.bind(this)
     }
@@ -52,8 +51,11 @@ class DgraphSchema {
       );
   }
 
-  mutate(params) {
-    
+  mutate(mutation) {
+    const mu = new this.connection.Mutation();
+    mu.setSetJson(mutation);
+    return this.connection.client.newTxn()
+      .mutate(mu);
   }
 }
 

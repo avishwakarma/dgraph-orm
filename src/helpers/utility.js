@@ -15,6 +15,10 @@ function checkOptions(name, options) {
     return;
   }
 
+  if(options.type === types.UID && !options.model) {
+    throw new Error('[Type Error]: In ' + name + ' of type ' + options.type.toUpperCase() + ', model is required.');
+  }
+
   if(options.count && (options.type !== types.UID && !options.list)) {
     throw new Error('[Type Error]: In ' + name + ' of type ' + options.type.toUpperCase() + ', count requires list.');
   }

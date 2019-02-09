@@ -9,6 +9,6 @@ typemap[types.BOOL] = ['list', 'count', 'index', 'upsert'];
 typemap[types.DATETIME] = ['list', 'count', 'index', 'upsert', 'token'];
 typemap[types.GEO] = ['list', 'count', 'index', 'upsert'];
 typemap[types.PASSWORD] = [];
-typemap[types.UID] = ['count', 'reverse'];
+typemap[types.UID] = ['count', 'reverse', 'model'];
 
 module.exports = typemap;

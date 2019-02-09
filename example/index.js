@@ -1,6 +1,6 @@
 import grpc from 'grpc';
 
-import dgraph from '../lib';
+import dgraph from '../src';
 
 /**
  * dgraph.connect
@@ -50,7 +50,6 @@ dgraph.connect({
  * 
  * @params {string} name // name of the schema
  * @params {object} schema // schema options
- * @params {object} options (optional) // generate schame options
  * 
  * in the below code the schame will be generated a nd prefixed with name
  * 
@@ -88,7 +87,19 @@ const UserSchema = new dgraph.Schema('user', {
    * 
    * user.bio string .
    */
-  bio: dgraph.Types.STRING
+  bio: dgraph.Types.STRING,
+
+  /**
+   * Generated Dgraph Schema
+   * 
+   * user.friend uid @count @reverse
+   */
+  friend: {
+    type: dgraph.Types.UID,
+    model: 'user',
+    count: true,
+    reverse: true
+  }
 });
 
 /**
@@ -98,22 +109,22 @@ const UserSchema = new dgraph.Schema('user', {
  */
 const User = dgraph.model(UserSchema);
 
-/**
- * query
- * 
- * query model method
- */
-User.query({
-  query: '', // Dgraph Query string,
-  variables: {} // Query variables
-});
+// /**
+//  * query
+//  * 
+//  * query model method
+//  */
+// User.query({
+//   query: '', // Dgraph Query string,
+//   variables: {} // Query variables
+// });
 
-/**
- * mutate
- * 
- * mutate model method
- */
-User.mutate({
-  mutation: '', // Dgraph mutation,
-  variables: {} // Dgraph mutation varuiables
-});
+// /**
+//  * mutate
+//  * 
+//  * mutate model method
+//  */
+// User.mutate({
+//   mutation: '', // Dgraph mutation,
+//   variables: {} // Dgraph mutation varuiables
+// });
