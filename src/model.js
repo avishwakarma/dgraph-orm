@@ -1,28 +1,88 @@
 const Query = require('./query');
+const methods = require('./helpers/methods');
 
 class Model{
-  constructor(schema, models, connection) {
+  constructor(schema, models, connection, logger) {
     this.schema = schema;
     this.models = models;
     this.connection = connection;
+    this._logger = logger;
+
+    const _methods = this._generate_methods()
     
     return {
       schema: this.schema,
+      queryWithVars: this.queryWithVars.bind(this),
       query: this.query.bind(this),
       mutate: this.mutate.bind(this),
-      find: this.find.bind(this),
-      findByUid: this.findByUid.bind(this)
+      ..._methods
     }
   }
 
-  query(params) {
-    return this.client.newTxn().queryWithVars(params.query, params.variables);
+  _generate_methods() {
+    const _methods = {};
+    Object.keys(methods).forEach(_method => {
+      _methods[_method] = this._method.bind(this, _method);
+    });
+
+    return _methods;
+  }
+
+  _method(type, field, value, params) {    
+    if(type === methods.uid || type === methods.has) {
+      params = value;
+      value = field;
+    }
+    
+    params = this._validate(this.schema.original, params);
+
+    const query = new Query(type, field, value, params, this.schema.name, this._logger);
+
+    return this._execute(query.query);
+  }
+
+  query(query) {
+    return new Promise((resolve, reject) => {
+      return this.connecton.client
+        .newTxn()
+        .query(query)
+        .then(res => {
+          return resolve(res.getJson());
+        }).catch(error => {
+          this._logger(error);
+          return reject(error);
+        });
+    })
+  }
+
+  queryWithVars(params) {
+    return new Promise((resolve, reject) => {
+      return this.connecton.client
+        .newTxn()
+        .queryWithVars(params.query, params.variables)
+        .then(res => {
+          return resolve(res.getJson());
+        }).catch(error => {
+          this._logger(error);
+          return reject(error);
+        });
+    });
   }
 
   mutate(params) {
-    const mu = new this.connection.Mutation();
-    mu.setSetJson(params.mutation);
-    return this.connection.client.newTxn().mutate(mu);
+    return new Promise((resolve, reject) => {
+      const mu = new this.connection.Mutation();
+      mu.setSetJson(params.mutation);
+      return this.connection.client
+        .newTxn()
+        .mutate(mu)
+        .then(res => {
+          return resolve(res.getJson());
+        }).catch(error => {
+          this._logger(error);
+          return reject(error);
+        });
+    })
   }
 
   _check_attributes(original, attributes){
@@ -51,7 +111,7 @@ class Model{
     return _attrs;
   }
  
-  _validate(original, params) {
+  _validate(original, params = {}) {
     if(!params.attributes || params.attributes.length === 0) {
       params.attributes = this._all_attributes(original);
     }
@@ -73,29 +133,15 @@ class Model{
     return params;
   }
 
-  find(params) {
-    params = this._validate(this.schema.original, params || {});
-    const query = new Query(this.schema.name, params);
-
-    //console.log(query);
-
-    // return this._execute(query);
-  }
-
   _execute(query) {
-    return this.connection.client.newTxn().query(query);
-  }
-
-  findByUid(uid, params) {
-    params = this._validate(this.schema.original, params || {});
-    const query = new Query(this.schema.name, {
-      ...params,
-      where: {
-        $uid: uid
-      }
-    });
-
-    //return this._execute(query);
+    return new Promise((resolve, reject) => {
+      return this.connection.client.newTxn().query(query).then(res => {
+        return resolve(res.getJson()[this.schema.name]);
+      }).catch(error => {
+        this._logger(error);
+        return reject(error);
+      });
+    })
   }
 }
 

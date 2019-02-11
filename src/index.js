@@ -6,19 +6,29 @@ const Model = require('./model');
 class DgraphSchema {
   constructor() {
     this._models = [];
+    this._logger = console.log;
     this.connection = this._create_connection();
     
     return {
       connect: this.connect.bind(this),
       Schema: Schema,
       model: this.model.bind(this),
-      Types: Types
+      Types: Types,
+      logging: this.logging.bind(this)
     }
+  }
+
+  logging(callback) {
+    this._logger = callback;
+  }
+
+  _log(message) {
+    this._logger(message);
   }
 
   async _set_model(schema) {
     if(typeof this._models[schema.name] === 'undefined') {
-      this._models[schema.name] = true;
+      this._models[schema.name] = schema.original;
       const op = new this.connection.Operation();
       op.setSchema(schema.schema.join("\n"));
       await this.connection.client.alter(op);
@@ -26,19 +36,13 @@ class DgraphSchema {
   }
 
   _create_connection(config) {
-    return new Connection(config);
+    return new Connection(config, this._log.bind(this));
   }
 
   model(schema) {
-    this._models[schema.name] = schema.original;
     this._set_model(schema);
 
-    return new Model(schema, this._models, this.connection);
-
-    // return {
-    //   query: this.query.bind(this),
-    //   mutate: this.mutate.bind(this)
-    // }
+    return new Model(schema, this._models, this.connection, this._log.bind(this));
   }
 
   connect(config) {

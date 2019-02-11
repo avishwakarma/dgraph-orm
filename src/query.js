@@ -1,41 +1,66 @@
 
-const _first_key_map = {
-  $uid: 'uid',
-  $uidIn: 'uid_in',
-  $has: 'has',
-  $near: 'near',
-  $within: 'within',
-  $contains: 'contains',
-  $intersects: 'intersects',
-  $allofterms: 'allofterms',
-  $anyofterms: 'anyofterms',
-  $regexp: 'regexp',
-  $alloftext: 'alloftext',
-  $eq: 'eq',
-  $le: 'le',
-  $lt: 'lt',
-  $ge: 'ge',
-  $gt: 'gt'
-}
+const methods = require('./helpers/methods');
 
 class Query {
-  constructor(name, params) {
+  constructor(type, field, value, params, name, logger) {
     this.name = name;
     this.params = params;
+    this.type = type;
+    this.field = field;
+    this.value = value;
+    this.logger = logger;
+    
     return {
       query: this._compose_params(),
     };
   }
 
   _compose_params() {
+    this._where(this.type, this.field, this.value, this.name);
     return this._build(this.params)
   }
 
-  _where(type, where) {
+  _where(type, field, value, name) {
     let _where = '';
+
+    switch (type) {
+      case methods.eq:
+      case methods.allofterms:
+      case methods.alloftext:
+      case methods.anyofterms:
+      case methods.anyoftext:
+        _where = `(func: ${type}(${name}.${field}, ${'"' + value + '"'}){{ORDER}}{{LIMIT}})`;
+      break;
+
+      case methods.regexp:
+        _where = `(func: ${type}(${name}.${field}, ${value}){{ORDER}}{{LIMIT}})`;
+      break;
+
+      case methods.uid:
+        if(Array.isArray(field)) {
+          field = field.join(', ');
+        }
+        _where = `(func: ${methods.uid}(${field}){{ORDER}}{{LIMIT}})`;
+      break;
+
+      case methods.has:
+        _where = `(func: ${methods.has}(${name}.${field}){{ORDER}}{{LIMIT}})`;
+      break;
+
+      case methods.near:
+        _where = `(func: ${methods.near}(${name}.${field}, [${value.longitude}, ${value.latitude}], ${value.distance}){{ORDER}}{{LIMIT}})`;
+      break;
+
+      case methods.contains:
+        _where = `(func: ${methods.contains}(${name}.${field}, [${value.longitude}, ${value.latitude}]){{ORDER}}{{LIMIT}})`;
+      break;
+      
+    }
+
+    this.where = _where;
   }
 
-  _parse_filter(key, value, name) {
+  _filter(key, value, name) {
     if(key.toLowerCase() === '$has') {
       return `${key.replace('$', '')}(${name}.${value})`;
     }
@@ -76,19 +101,18 @@ class Query {
     return _first;
   }
 
-  _parse_where(where, name, filterOnly = false) {
-    
+  _parse_filter(filter, name) {
 
     const _filters = []
 
-    if(typeof where['filters'] !== 'undefined') {
-      Object.keys(where['filters']).forEach(_key => {
+    if(typeof filter !== 'undefined') {
+      Object.keys(filter).forEach(_key => {
         if(_key.toLowerCase() !== '$and' && _key.toLowerCase() !== '$or') {
-          _filters.push(this._parse_filter(_key, where['filters'][_key], name));
+          _filters.push(this._filter(_key, filter[_key], name));
         }else {
           const _sub = []
-          Object.keys(where['filters'][_key]).forEach(_k => {
-            _sub.push(this._parse_filter(_k, where['filters'][_key][_k], name))
+          Object.keys(filter[_key]).forEach(_k => {
+            _sub.push(this._filter(_k, filter[_key][_k], name))
           });
 
           if(_sub.length > 0) {
@@ -98,17 +122,11 @@ class Query {
       });
     }
 
-    if(filterOnly) {
+    if(_filters.length > 0) {
       return ` @filter(${_filters.join(' AND ')})`;
     }
 
-    let _where = `(func: ${this._parse_first_where(where, name)}{{ORDER}}{{LIMIT}})`;
-
-    if(_filters.length > 0) {
-      _where += ` @filter(${_filters.join(' AND ')})`;
-    }
-
-    return _where;
+    return '';
   }
 
   _attributes(attributes, name) {
@@ -136,10 +154,18 @@ class Query {
       _inc += `${include[relation].as ? include[relation].as : relation}: ${this.name}.${relation}`;
 
       const _limit = this._extras(include[relation]);
-        const _order = this._parse_order(include[relation]);
+      const _order = this._parse_order(include[relation].order);
 
       if(include[relation].filter) {
-        _inc +=  `${this._parse_where({filters: include[relation].filter}, include[relation].model, true)}`
+        _inc +=  `${this._parse_filter(include[relation].filter, include[relation].model)}`
+      }
+
+      if(_limit) {
+        _inc += ` (${_limit}) `;
+      }
+
+      if(_order) {
+        _inc += ` (${_order})`;
       }
 
       _inc += `{
@@ -166,7 +192,7 @@ class Query {
     }
 
     if(_extra.length > 0) {
-      return `, ${_extra.join(', ')}`;
+      return `${_extra.join(', ')}`;
     }
 
     return '';
@@ -188,23 +214,32 @@ class Query {
     }
 
     if(_order.length > 0) {
-      return `, ${_order.join(', ')}`;
+      return `${_order.join(', ')}`;
     }
 
     return '';
   }
 
   _build(params) {
-    const _order = this._parse_order(params.order);
-    const _limit = this._extras(params);
+    let _order = this._parse_order(params.order);
+    let _limit = this._extras(params);
+
+    if(_order) {
+      _order = `, ${_order}`;
+    }
+
+    if(_limit) {
+      _limit = `, ${_limit}`;
+    }
+
     const query = `{
-      ${this.name} ${this._parse_where(params.where, this.name).replace('{{ORDER}}', _order).replace('{{LIMIT}}', _limit)} {
+      ${this.name} ${this.where.replace('{{ORDER}}', _order).replace('{{LIMIT}}', _limit)} ${this._parse_filter(params.filter, this.name)} {
         ${this._attributes(params.attributes, this.name)}
         ${this._include(params.include)}
       }
     }`;
 
-    console.log(query);
+    this.logger(query);
 
     return query;
   }

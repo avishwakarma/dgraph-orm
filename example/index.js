@@ -1,6 +1,6 @@
 import grpc from 'grpc';
 
-import dgraph from '../src';
+import dgraph from '../lib';
 
 /**
  * dgraph.connect
@@ -109,59 +109,33 @@ const UserSchema = new dgraph.Schema('user', {
  */
 const User = dgraph.model(UserSchema);
 
-// User.findByUid('0x1');
-
-User.find({
-  where: {
-    name: {
-      $eq: 'Ashok',
-    },
-    filters: {
-      $has: 'friend',
-      $or: {
-        name: {
-          $eq: 'Ashok'
-        },
-        email: {
-          $eq: 'akvlko@gmail.com'
-        }
-      },
-      bio: {
-        $regexp: '/hi, there/'
-      }
-    }
-  },
-  first: 5,
-  after: '0x1',
-  offset: 2,
-  order: [['email', 'ASC'], ['name', 'DESC']],
-  include: {
-    friend: {
-      filter: {
-        name: {
-          $eq: 'Ashok'
-        }
-      }
-    }
-  }
-});
-
-// /**
-//  * query
-//  * 
-//  * query model method
-//  */
-// User.query({
-//   query: '', // Dgraph Query string,
-//   variables: {} // Query variables
-// });
-
-// /**
-//  * mutate
-//  * 
-//  * mutate model method
-//  */
-// User.mutate({
-//   mutation: '', // Dgraph mutation,
-//   variables: {} // Dgraph mutation varuiables
-// });
+/**
+ * @example
+ * 
+ * User.has(field_name: String, options);
+ * 
+ * User.eq(field_name: String, value: String, options);
+ * 
+ * User.uid(uid_value: String | String[], options);
+ * 
+ * User.allofterms(field: String, value: String, options);
+ * 
+ * User.anyofterms(field: String, value: String, options);
+ * 
+ * User.anyoftext(field: String, value: String, options);
+ * 
+ * User.alloftext(field: String, value: String, options);
+ * 
+ * User.regexp(field: String, regex: String, options);
+ * 
+ * User.near(field: String, value = {
+ *  latitude: float,
+ *  longitude: float
+ *  distance: number
+ * }, options);
+ * 
+ * User.contains(field: String, value = {
+ *  latitude: float,
+ *  longitude: float
+ * }, options);
+ */

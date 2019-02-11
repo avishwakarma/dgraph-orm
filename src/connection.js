@@ -9,21 +9,25 @@ const _config = {
 }
 
 class Connection {
-  constructor(config = {}) {
+  constructor(config = {}, logger) {
     this.config = {
       ..._config,
       ...config
     };
 
-    this.clientStub = new dgrpah.DgraphClientStub(
-      `${this.config.host}:${this.config.port}`,
-      this.config.credentails
-    );
-
-    this.client = new dgrpah.DgraphClient(this.clientStub);
-
-    if(this.config.debug) {
-      this.client.setDebugMode(true);
+    try {
+      this.clientStub = new dgrpah.DgraphClientStub(
+        `${this.config.host}:${this.config.port}`,
+        this.config.credentails
+      );
+  
+      this.client = new dgrpah.DgraphClient(this.clientStub);
+  
+      if(this.config.debug) {
+        this.client.setDebugMode(true);
+      }
+    } catch (error) {
+      logger(error);
     }
 
     return {

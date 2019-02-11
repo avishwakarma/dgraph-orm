@@ -82,7 +82,7 @@ function prepareSchema(name, options) {
   }
 
   Object.keys(options).forEach(function(key){
-    if(key === 'type' || key === 'list' || key === 'index' || key === 'token') {
+    if(key === 'type' || key === 'list' || key === 'index' || key === 'token' || key === 'model') {
       return;
     }
 

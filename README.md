@@ -1,9 +1,9 @@
 # DgraphORM
-An ORM for Dgraph (in development)
+An ORM for Dgraph
 
 ## What its all about
 
-DgraphORM is a package to simplify the schema creation for Dgraph similar to Mongoose, Sequilize.
+DgraphORM is a package to simplify the schema creation for Dgraph similar to Mongoose, Sequilize and etc.
 
 ## Installation
 
@@ -32,15 +32,19 @@ const UserSchema = new dgraph.Schema('user', {
       upsert: true // for unique
     }
   },
-  bio: dgraph.Types.STRING
+  bio: dgraph.Types.STRING,
+  friend: {
+    type: dgraph.Types.UID,
+    model: 'user', // related model name
+    count: true,
+    reverse: true
+  }
 });
 
+/**
+ * Set and create model out of the schema
+ */
 const User = dgraph.model(UserSchema);
-
-User.query({
-  query: '', // Dgraph Query string,
-  variables: {} // Query variables
-});
 ```
 
 ## Types
@@ -100,3 +104,280 @@ const UserSchema = new dgraph.Schema('user', {
 ```
 
 Different field type can have diferent type of indexes and tokenizers, please see [Dgraph Documentaion](https://docs.dgraph.io/query-language/#indexing) for the same.
+
+## Main methods
+
+```javascript
+import dgraph from 'dgraph-orm';
+
+/**
+ * connect
+ * 
+ * Connect dgraph database
+ */
+dgraph.connect(host, port, credential);
+
+/**
+ * model
+ * 
+ * Generate model from schema
+ */
+dgraph.model(Schema);
+
+/**
+ * logging
+ * 
+ * set custom logger
+ * 
+ * Default is console.log
+ */
+dgraph.logging(logger: function)
+```
+
+
+## Model methods
+
+The created model have methods to query the dgraph database
+
+```javascript
+/**
+ * query
+ * 
+ * dgraph's raw query
+ */
+User.query(query: String);
+
+/**
+ * queryWithVars
+ * 
+ * dgraph's raw query with varibales
+ * 
+ * to know more visit
+ * https://docs.dgraph.io/master/query-language/#graphql-variables
+ * 
+ */
+User.queryWithVars(params = {
+  query: String,
+  variables: {}
+});
+a
+/**
+ * mutate
+ * 
+ * dgraph's mutation
+ * 
+ * to know more visit
+ * https://docs.dgraph.io/master/mutations/#json-mutation-format
+ * 
+ */
+User.mutaute({
+  field_name: value
+});
+
+/**
+ * has
+ * 
+ * dgraph has root method to query nodes
+ */ 
+User.has(field_name: String, options);
+
+/**
+ * eq
+ * 
+ * dgraph eq root method to query nodes
+ */
+User.eq(field_name: String, value: String, options);
+
+/**
+ * uid
+ * 
+ * dgraph's uid root method to query nodes
+ */
+User.uid(uid_value: String | String[], options);
+
+/**
+ * allofterms
+ * 
+ * dgraph's allofterms root method to query nodes
+ * 
+ */
+User.allofterms(field: String, value: String, options);
+
+/**
+ * anyofterms
+ * 
+ * dgraph's anyofterm root method to quert nodes
+ */
+User.anyofterms(field: String, value: String, options);
+
+/**
+ * anyoftext
+ * 
+ * dgraph's anyoftext root method to query nodes
+ */
+User.anyoftext(field: String, value: String, options);
+
+/**
+ * alloftext
+ * 
+ * dgaph's alloftext root method to query nodes
+ */
+User.alloftext(field: String, value: String, options);
+
+/**
+ * regexp
+ * 
+ * dgraph's regexp method to query nodes
+ */
+User.regexp(field: String, regex: String, options);
+
+/**
+ * near
+ * 
+ * dgraph's near root method to query nodes
+ * 
+ * Note: only works with geo type predicate
+ */
+User.near(field: String, value = {
+  latitude: float,
+  longitude: float
+  distance: number
+}, options);
+
+/**
+ * contains
+ * 
+ * dgraph's contains root method to query nodes
+ * 
+ * Note: only works with geo type predicate
+ */
+User.contains(field: String, value = {
+  latitude: float,
+  longitude: float
+}, options);
+```
+
+### Options
+
+Every model method acceopts options to filter, paginate and order the nodes
+
+```javascript
+// Simple filtering
+
+// retrive all nodes having user.name and user.email 'akvlko@gmail.com'
+
+User.has('name', {
+  filter: {
+    email: {
+      $eq: 'akvlko@gmail.com'
+    }
+  }
+});
+
+// OR condition
+
+// retrives all the nodes having user.name where user.email is 'akvlko@gmail.com' or user.name is 'Ashok'
+
+User.has('name', {
+  filter: {
+    $or: {
+      name: {
+        $eq: 'Ashok'
+      },
+      email: {
+        $eq: 'akvlko@gmail.com'
+      }
+    }
+  }
+});
+
+// Specific Attributes
+
+// retrives all the nodes having user.name with their name and email only
+
+// PS: by default fetches all the fields defined in the schema (exepct relations) if attributes property is not given.
+
+User.has('name', {
+  attribute: ['name', 'email']
+});
+
+// Single Order
+
+// retrives all the nodes having user.name and order them by user.email ASC
+
+User.has('name', {
+  order: ['email', 'ASC']
+});
+
+
+// Multiple order
+
+// retrives all the nodes having user.name and order them user.name ASC and user.email DESC
+
+User.has('name', {
+  order: [['name', 'ASC'], ['email', 'DESC']]
+});
+
+// Pagination
+
+// Retrives 10 nodes having user.name skipping first 5 after 0.x25 uid
+
+User.has('name', {
+  first: 10,
+  offset: 5,
+  after: '0x25'
+});
+
+// Quering Relation
+
+// Retrives all the nodes haing user.name along with count of their friend as friends
+
+User.has('name', {
+  include: {
+      freind: {
+      count: true,
+      as: 'freinds'
+    }
+  }
+});
+
+// Full options in relation
+
+User.has('name', {
+  include: {
+    friend: {
+      as: 'freinds',
+      filter: {}, // accept a filter like the above example
+      attributes: ['name', 'email'], // accepts attributes like the abobe example
+      order: [], // accepts order like the above example
+      first: 10, // accepts first
+      offset: 2, // accepts offset
+      after: '0x21' // accepts after
+    }
+  }
+});
+
+```
+
+## Futute releases
+
+* Relation of relation
+* Other geo queries witin, intersects
+* Groupby
+
+
+## Contribution
+
+Issues and pull requests are welcome for
+
+* Unit test cases
+* Feature and query method implementation
+* Bug fixes
+
+## Author
+![my_pic](https://avatars1.githubusercontent.com/u/389185?s=100&v=1)
+
+[](https://avatars1.githubusercontent.com/u/389185?s=460&v=4)
+### Ashok Vishwakarma
+
+[LinkedIn](https://www.linkedin.com/in/ashokvishwakarmaa/) &bull; [Twitter](https://twitter.com/_avishwakarma) &bull; [Medium](https://medium.com/@avishwakarma)
