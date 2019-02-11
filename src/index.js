@@ -1,6 +1,7 @@
 const Schema = require('./schema');
 const Types = require('./helpers/types');
 const Connection = require('./connection');
+const Model = require('./model');
 
 class DgraphSchema {
   constructor() {
@@ -32,10 +33,12 @@ class DgraphSchema {
     this._models[schema.name] = schema.original;
     this._set_model(schema);
 
-    return {
-      query: this.query.bind(this),
-      mutate: this.mutate.bind(this)
-    }
+    return new Model(schema, this._models, this.connection);
+
+    // return {
+    //   query: this.query.bind(this),
+    //   mutate: this.mutate.bind(this)
+    // }
   }
 
   connect(config) {

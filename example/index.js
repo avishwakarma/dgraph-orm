@@ -109,6 +109,43 @@ const UserSchema = new dgraph.Schema('user', {
  */
 const User = dgraph.model(UserSchema);
 
+// User.findByUid('0x1');
+
+User.find({
+  where: {
+    name: {
+      $eq: 'Ashok',
+    },
+    filters: {
+      $has: 'friend',
+      $or: {
+        name: {
+          $eq: 'Ashok'
+        },
+        email: {
+          $eq: 'akvlko@gmail.com'
+        }
+      },
+      bio: {
+        $regexp: '/hi, there/'
+      }
+    }
+  },
+  first: 5,
+  after: '0x1',
+  offset: 2,
+  order: [['email', 'ASC'], ['name', 'DESC']],
+  include: {
+    friend: {
+      filter: {
+        name: {
+          $eq: 'Ashok'
+        }
+      }
+    }
+  }
+});
+
 // /**
 //  * query
 //  * 

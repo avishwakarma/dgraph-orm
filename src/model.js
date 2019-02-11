@@ -1,15 +1,17 @@
 const Query = require('./query');
 
 class Model{
-  constructor(schema, models, client) {
+  constructor(schema, models, connection) {
     this.schema = schema;
     this.models = models;
-    this.client = client;
+    this.connection = connection;
     
     return {
       schema: this.schema,
       query: this.query.bind(this),
-      mutate: this.mutate.bind(this)
+      mutate: this.mutate.bind(this),
+      find: this.find.bind(this),
+      findByUid: this.findByUid.bind(this)
     }
   }
 
@@ -18,9 +20,9 @@ class Model{
   }
 
   mutate(params) {
-    const mu = new this.client.Mutation();
+    const mu = new this.connection.Mutation();
     mu.setSetJson(params.mutation);
-    return this.client.newTxn().mutate(mu);
+    return this.connection.client.newTxn().mutate(mu);
   }
 
   _check_attributes(original, attributes){
@@ -71,15 +73,29 @@ class Model{
     return params;
   }
 
-  findById(id, params) {
+  find(params) {
     params = this._validate(this.schema.original, params || {});
-    
-    return new Query('id', this.schema.name, {
+    const query = new Query(this.schema.name, params);
+
+    //console.log(query);
+
+    // return this._execute(query);
+  }
+
+  _execute(query) {
+    return this.connection.client.newTxn().query(query);
+  }
+
+  findByUid(uid, params) {
+    params = this._validate(this.schema.original, params || {});
+    const query = new Query(this.schema.name, {
       ...params,
       where: {
-        uid: id
+        $uid: uid
       }
-    }, this.client);
+    });
+
+    //return this._execute(query);
   }
 }
 
