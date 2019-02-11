@@ -1,6 +1,6 @@
 {
   "name": "dgraph-orm",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "An ORM for Dgraph",
   "main": "index.js",
   "scripts": {
