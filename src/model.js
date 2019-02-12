@@ -17,8 +17,53 @@ class Model{
       create: this.create.bind(this),
       update: this.update.bind(this),
       delete: this.delete.bind(this),
+      checkPassword: this.checkPassword.bind(this),
       ..._methods
     }
+  }
+
+  _check_if_password_type(field) {
+    const _field = this.schema.original[field];
+
+    if(typeof _field === 'undefined') {
+      return false;
+    }
+
+    if(typeof _field === 'string' && _field === 'password') {
+      return true;
+    }
+
+    if(typeof _field === 'object' && _field.type === 'password') {
+      return true;
+    }
+
+    return false;
+  }
+
+  async checkPassword(uid, field, password) {
+    return new Promise(async (resolve, reject) => {
+      try {
+
+        if(!this._check_if_password_type(field)) {
+          throw new Error(`Field ${field} is not of type PASSWORD.`)
+        }
+
+        const check = await this._execute(`{
+          ${this.schema.name} (func: uid(${uid})) {
+            isValid: checkpwd(${this.schema.name}.${field}, "${password}")
+          }
+        }`);
+
+        if(check.length === 0) {
+          return resolve(false);
+        }
+
+        return resolve(check[0].isValid);
+
+      } catch (error) {
+        return reject(error);
+      }
+    });
   }
 
   _generate_methods() {
@@ -111,7 +156,7 @@ class Model{
       const _txn = this.connection.client.newTxn();
 
       try {
-        const mu = new this.connection.Mutation();
+        const mu = new this.connection.dgraph.Mutation();
         mu.setSetJson(mutation);
 
         const _unique_check = await this._check_unique_values(mutation, _txn);
@@ -148,7 +193,7 @@ class Model{
       const _txn = this.connection.client.newTxn();
 
       try {
-        const mu = new this.connection.Mutation();
+        const mu = new this.connection.dgraph.Mutation();
         mutation.uid = uid;
         mu.setSetJson({
           set: mutation
@@ -212,7 +257,7 @@ class Model{
       const _txn = this.connection.client.newTxn();
 
       try {
-        const mu = new this.connection.Mutation();
+        const mu = new this.connection.dgraph.Mutation();
 
         mu.setDeleteJson(mutation);
         
@@ -306,7 +351,7 @@ class Model{
   _all_attributes(original) {
     const _attrs = [];
     for(let attr of Object.keys(original)) {
-      if(original[attr].type === 'uid') {
+      if(original[attr].type === 'uid' || original[attr] === 'password' || original[attr].type === 'password') {
         continue;
       }
       _attrs.push(attr);

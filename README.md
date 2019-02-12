@@ -27,11 +27,12 @@ const UserSchema = new dgraph.Schema('user', {
   email: {
     type: dgraph.Types.STRING,
     index: true,
+    unique: true,
     token: {
-      exact: true,
-      upsert: true // for unique
+      exact: true
     }
   },
+  password: dgraph.Types.PASSWORD,
   bio: dgraph.Types.STRING,
   friend: {
     type: dgraph.Types.UID,
@@ -51,8 +52,6 @@ const User = dgraph.model(UserSchema);
 DgraphORM suports all the types supported in Dgraph
 
 ```javascript
-
-import dgraph from 'dgraph-orm';
 
 // uid
 dgraph.Types.UID
@@ -133,6 +132,52 @@ dgraph.model(Schema);
  * Default is console.log
  */
 dgraph.logging(logger: function)
+
+/**
+ * disconnect
+ * 
+ * close database connection
+ */
+dgraph.disconnect();
+
+/**
+ * original 
+ * 
+ * dgraph-js properties
+ * 
+ * All properties from dgraph-js are also availble in the dgraph object
+ * 
+ * Payload
+ * createPayload
+ * Response
+ * createResponse
+ * Mutation
+ * Operation
+ * Request
+ * Assigned
+ * TxnContext
+ * Check
+ * Version
+ * NQuad
+ * Value
+ * Facet
+ * SchemaNode
+ * LinRead
+ * Latency
+ * DgraphClientStub
+ * DgraphClient
+ * deleteEdges
+ * Txn
+ * ERR_NO_CLIENTS
+ * ERR_FINISHED
+ * ERR_ABORTED
+ * 
+ * Check dgraph-js documentaion for more details
+ * 
+ * https://github.com/dgraph-io/dgraph-js
+ */
+dgraph.original;
+
 ```
 
 
@@ -183,6 +228,27 @@ User.update({
 }, {
   field: value
 } or uid: String);
+
+/**
+ * delete
+ * 
+ * dgraph's delete mutation
+ * 
+ */
+User.delete(uid: String);
+
+// Delete multiple uids
+User.delete([uid1: String, uid2: String]);
+
+/**
+ * checkPassword
+ * 
+ * dgraph's checkpwd query
+ * 
+ * Note: A field type PASSWORD 
+ * 
+ */
+User.checkPassword(uid: String, field: string, password: String);
 
 /**
  * has

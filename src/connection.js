@@ -1,4 +1,4 @@
-const dgrpah = require('dgraph-js');
+const dgraph = require('dgraph-js');
 const grpc = require('grpc');
 
 const _config = {
@@ -16,12 +16,12 @@ class Connection {
     };
 
     try {
-      this.clientStub = new dgrpah.DgraphClientStub(
+      this.clientStub = new dgraph.DgraphClientStub(
         `${this.config.host}:${this.config.port}`,
         this.config.credentails
       );
   
-      this.client = new dgrpah.DgraphClient(this.clientStub);
+      this.client = new dgraph.DgraphClient(this.clientStub);
   
       if(this.config.debug) {
         this.client.setDebugMode(true);
@@ -31,7 +31,7 @@ class Connection {
     }
 
     return {
-      ...dgrpah,
+      dgraph: dgraph,
       client: this.client,
       close: this.close.bind(this)
     }

@@ -10,12 +10,18 @@ class DgraphSchema {
     this.connection = this._create_connection();
     
     return {
+      original: this.connection.dgraph,
+      logging: this.logging.bind(this),
       connect: this.connect.bind(this),
       Schema: Schema,
       model: this.model.bind(this),
       Types: Types,
-      logging: this.logging.bind(this)
+      disconnect: this.disconnect.bind(this)
     }
+  }
+
+  disconnect() {
+    this.connection.close();
   }
 
   logging(callback) {
@@ -29,7 +35,7 @@ class DgraphSchema {
   async _set_model(schema) {
     if(typeof this._models[schema.name] === 'undefined') {
       this._models[schema.name] = schema.original;
-      const op = new this.connection.Operation();
+      const op = new this.connection.dgraph.Operation();
       op.setSchema(schema.schema.join("\n"));
       await this.connection.client.alter(op);
     }

@@ -70,9 +70,16 @@ const UserSchema = new dgraph.Schema('user', {
   },
 
   /**
+   * Generated Dgraph schema
+   * 
+   * user.password password .
+   */
+  password: dgraph.Types.PASSWORD,
+
+  /**
    * Generated Dgraph Schema
    * 
-   * user.email string @index(excat) @upsert .
+   * user.email string @index(excat) .
    */
   email: {
     type: dgraph.Types.STRING,
@@ -144,7 +151,8 @@ const User = dgraph.model(UserSchema);
   // const user = await User.create({
   //   name: 'Parinita Sharma',
   //   email: 'parinitashr413@gmail.com',
-  //   bio: 'Co Founder and COO, Impulsive Web Pvt. Ltd.'
+  //   bio: 'Co Founder and COO, Impulsive Web Pvt. Ltd.',
+  //   password: 'p@ssw0rd'
   // });
 
   // await User.update({
@@ -166,4 +174,8 @@ const User = dgraph.model(UserSchema);
   // const data = await User.has('name');
 
   // console.log(data);
+
+  // const _check = await User.checkPassword('0x1', 'password', 'p@ssw0rd');
+
+  // console.log(_check);
 })();
