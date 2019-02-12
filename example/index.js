@@ -40,7 +40,7 @@ dgraph.connect({
    * @default grpc.credentials.createInsecure()
    * 
    */
-  credentails: grpc.credentials.createInsecure() 
+  credentails: grpc.credentials.createInsecure()
 });
 
 /**
@@ -77,7 +77,7 @@ const UserSchema = new dgraph.Schema('user', {
   email: {
     type: dgraph.Types.STRING,
     index: true,
-    upsert: true, // for unique
+    unique: true,
     token: {
       exact: true
     }
@@ -139,3 +139,31 @@ const User = dgraph.model(UserSchema);
  *  longitude: float
  * }, options);
  */
+
+(async () => {
+  // const user = await User.create({
+  //   name: 'Parinita Sharma',
+  //   email: 'parinitashr413@gmail.com',
+  //   bio: 'Co Founder and COO, Impulsive Web Pvt. Ltd.'
+  // });
+
+  // await User.update({
+  //   name: 'Parinita Sharma',
+  //   bio: 'Co Founder and COO, Impulsive Web Pvt. Ltd.'
+  // }, {
+  //   email: 'parinitashr413@gmail.com'
+  // });
+
+  // await User.update({
+  //   name: 'Parinita Sharma',
+  //   bio: 'Co Founder and COO, Impulsive Web Pvt. Ltd.'
+  // }, '0x8');
+
+  // await User.delete('0x8');
+
+  // console.log(user);
+
+  // const data = await User.has('name');
+
+  // console.log(data);
+})();

@@ -90,6 +90,7 @@ import dgraph from 'dgraph-orm';
 const UserSchema = new dgraph.Schema('user', {
   name: {
     type: dgraph.Types.STRING,
+    unique: true, // enable unique constraint on the field (only works with type STRING, INT and FLOAT)
     list: true, // enable list type
     count: true, // enable count on the field
     lang: true, // enable lang type 
@@ -160,19 +161,28 @@ User.queryWithVars(params = {
   query: String,
   variables: {}
 });
-a
+
 /**
- * mutate
+ * create
  * 
- * dgraph's mutation
- * 
- * to know more visit
- * https://docs.dgraph.io/master/mutations/#json-mutation-format
+ * dgraph's create mutation
  * 
  */
-User.mutaute({
+User.create({
   field_name: value
 });
+
+/**
+ * update
+ * 
+ * dgraph's update mutation
+ * 
+ */
+User.update({
+  field_name: value
+}, {
+  field: value
+} or uid: String);
 
 /**
  * has
@@ -356,12 +366,90 @@ User.has('name', {
     }
   }
 });
+```
 
+## Create
+
+Create example using model
+
+```javascript
+// Create
+
+/**
+ * Creates a new user with passed fields
+ * 
+ * Returns the created user along with the generated uid
+ */
+const user = await User.create({
+  name: 'Ashok Vishwakarma',
+  email: 'akvlko@gmail.com',
+  bio: 'My bio ...'
+});
+
+console.log(user);
+// {
+//    uid: '0x1',
+//    name: 'Ashok Vishwakarma',
+//    email: 'akvlko@gmail.com',
+//    bio: 'My bio ...'
+// }
+```
+
+
+## Update
+
+Update example using model
+
+```javascript
+/**
+ * Recommended
+ * 
+ * using uid
+ */
+User.update({
+  name: 'Ashok Kumar Vishwakarma',
+}, '0x1');
+
+/**
+ * Not Recommended
+ * 
+ * using field
+ * Using field will update the first users matching with the field values
+ */
+User.update({
+  name: 'Ashok Kumar Vishwakarma',
+}, {
+  email: 'akvlko@gmail.com'
+});
+```
+
+
+## Delete
+
+Delete example using model
+
+__PS:__ Delete only support `<uid> * *` pattern, which means all the related predices will be deleted
+
+```javascript
+/**
+ * single user
+ * 
+ * Will delete the user having uid 0x1
+ */
+User.delete('0x1');
+
+/**
+ * multiple users
+ * 
+ * Will delete the users having uid 0x1 and 0x2
+ */
+User.delete(['0x1', '0x2']);
 ```
 
 ## Futute releases
 
 * Relation of relation
+* More delete paterns
 * Other geo queries witin, intersects
 * Groupby
 

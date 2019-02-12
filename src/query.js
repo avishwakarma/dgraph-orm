@@ -132,7 +132,11 @@ class Query {
   _attributes(attributes, name) {
     const _attrs = [];
     for(let attr of attributes) {
-      _attrs.push(`${attr}: ${name}.${attr}`);
+      if(attr === 'uid') {
+        _attrs.push('uid');
+      }else {
+        _attrs.push(`${attr}: ${name}.${attr}`);
+      }
     }
     
     return _attrs.join('\n');
