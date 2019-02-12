@@ -1,8 +1,8 @@
 {
   "name": "dgraph-orm",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "An ORM for Dgraph",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "babel src --optional runtime --out-dir lib/",
