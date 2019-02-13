@@ -149,9 +149,9 @@ const User = dgraph.model(UserSchema);
 
 (async () => {
   // const user = await User.create({
-  //   name: 'Parinita Sharma',
-  //   email: 'parinitashr413@gmail.com',
-  //   bio: 'Co Founder and COO, Impulsive Web Pvt. Ltd.',
+  //   name: 'Rahul Singh',
+  //   email: 'rahulsingh0818@gmail.com',
+  //   bio: 'Performance and load tester',
   //   password: 'p@ssw0rd'
   // });
 
@@ -178,4 +178,19 @@ const User = dgraph.model(UserSchema);
   // const _check = await User.checkPassword('0x1', 'password', 'p@ssw0rd');
 
   // console.log(_check);
+
+  // await User.update({
+  //   friend: '0x3'
+  // }, '0x1');
+
+  const users = await User.has('name', {
+    include: {
+      friend: {
+        count: true,
+        as: 'friends'
+      }
+    }
+  });
+
+  console.log(users);
 })();
