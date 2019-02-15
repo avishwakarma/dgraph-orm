@@ -180,17 +180,20 @@ const User = dgraph.model(UserSchema);
   // console.log(_check);
 
   // await User.update({
-  //   friend: '0x3'
+  //   friend: ['0x2711', '0x271c']
   // }, '0x1');
 
-  const users = await User.has('name', {
-    include: {
-      friend: {
-        count: true,
-        as: 'friends'
-      }
-    }
-  });
+  // await User.delete({
+  //   friend: ['0x271c', '0x2711']
+  // }, '0x1');
 
-  console.log(users);
+  // const users = await User.has('name', {
+  //   include: {
+  //     friend: {
+  //       as: 'friends'
+  //     }
+  //   }
+  // });
+
+  // console.log(users);
 })();

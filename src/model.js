@@ -81,7 +81,7 @@ class Model{
 
       try {
         const res = await _txn.query(query);
-        await _txn.commit();
+        // await _txn.commit();
         return resolve(res.getJson()[this.schema.name]);
       } catch (error) {
         await _txn.discard();
@@ -111,7 +111,7 @@ class Model{
 
       try {
         const data = await _txn.query(query);
-        await _txn.commit();
+        // await _txn.commit();
         return resolve(data.getJson());
       } catch (error) {
         await _txn.discard();
@@ -129,7 +129,7 @@ class Model{
 
       try {
         const data = await _txn.queryWithVars(params.query, params.variables);
-        await _txn.commit();
+        //await _txn.commit();
 
         return resolve(data.getJson());
       } catch (error) {
@@ -141,11 +141,37 @@ class Model{
     });
   }
 
+  _is_relation(_key) {
+    const _field = this.schema.original[_key];
+
+    if(typeof _field !== 'undefined' && _field.type === 'uid') {
+      return true;
+    }
+
+    return false;
+  }
+
   _parse_mutation(mutation, name) {
-    const _mutation = {};
+    let _mutation = {};
 
     Object.keys(mutation).forEach(_key => {
-      _mutation[`${name}.${_key}`] = mutation[_key];
+      if(this._is_relation(_key)) {
+        if(Array.isArray(mutation[_key])) {
+          const _m = [];
+          mutation[_key].forEach(_uid => {
+            _m.push({
+              uid: _uid
+            })
+          });
+          _mutation[`${name}.${_key}`] = _m;
+        }else {
+          _mutation[`${name}.${_key}`] = {
+            uid: mutation[_key]
+          };
+        }
+      }else {
+        _mutation[`${name}.${_key}`] = mutation[_key];
+      }
     });
 
     return _mutation;
@@ -165,6 +191,9 @@ class Model{
           await _txn.discard();
           return reject(new Error(`[Unique Constraint]: ${_unique_check}`));
         }
+
+        mu.setCommitNow(true);
+        mu.setIgnoreIndexConflict(true);
         
         const _mutation = await _txn.mutate(mu);
         await _txn.commit();
@@ -195,12 +224,12 @@ class Model{
       try {
         const mu = new this.connection.dgraph.Mutation();
         mutation.uid = uid;
-        mu.setSetJson({
-          set: mutation
-        });
+        mu.setCommitNow(true);
+        mu.setIgnoreIndexConflict(true);
+
+        mu.setSetJson(mutation);
         
         await _txn.mutate(mu);
-        await _txn.commit();
         return resolve(true);
       } catch (error) {
         await _txn.discard();
@@ -221,7 +250,7 @@ class Model{
       return;
     }
 
-    this._check_attributes(this.schema.original, Object.keys(data));
+    this._check_attributes(this.schema.original, Object.keys(data), true);
     const mutation = this._parse_mutation(data, this.schema.name);
 
     if(typeof uid === 'string') {
@@ -256,13 +285,15 @@ class Model{
     return new Promise(async (resolve, reject) => {
       const _txn = this.connection.client.newTxn();
 
+      console.log(mutation);
+
       try {
         const mu = new this.connection.dgraph.Mutation();
-
+        mu.setCommitNow(true);
+        mu.setIgnoreIndexConflict(true);
         mu.setDeleteJson(mutation);
         
         await _txn.mutate(mu);
-        await _txn.commit();
         return resolve(true);
       } catch (error) {
         await _txn.discard();
@@ -273,22 +304,58 @@ class Model{
     });
   }
 
-  async delete(uid) {
-    if(typeof uid === 'string') {
-      return this._delete({
-        uid
-      });
-    }
+  async delete(params, uid) {
 
-    if(Array.isArray(uid)) {
-      const _uids = [];
-      for(let _uid in uid) {
-        _uids.push({
-          uid: _uid
+    if(!uid) {
+      if(typeof params === 'string') {
+        return this._delete({
+          params
         });
       }
+  
+      if(Array.isArray(params)) {
+        const _uids = [];
+        for(let _uid in params) {
+          _uids.push({
+            uid: _uid
+          });
+        }
+  
+        return this._delete(_uids);
+      }
+    }else {
+      const _data = {};
+      _data.uid = uid;
 
-      return this._delete(_uids);
+      this._check_attributes(this.schema.original, Object.keys(params), true);
+
+      const _params = {};
+
+      for(let _key of Object.keys(params)) {
+        if(this._is_relation(_key)) {
+          if(Array.isArray(params[_key])) {
+            const _a = [];
+            params[_key].forEach(_uid => {
+              _a.push({
+                uid: _uid
+              });
+            });
+            _params[`${this.schema.name}.${_key}`] = _a;
+          }else {
+            _params[`${this.schema.name}.${_key}`] = {
+              uid: params[_key]
+            };
+          }
+        }else {
+          _params[`${this.schema.name}.${_key}`] = null;
+        }
+      }
+
+      return this._delete({
+        ..._data,
+        ..._params
+      });
+
     }
   }
 
@@ -334,7 +401,7 @@ class Model{
     });
   }
 
-  _check_attributes(original, attributes){
+  _check_attributes(original, attributes, isUpdate = false){
     if(!attributes || attributes.length === 0) {
       return;
     }
@@ -342,7 +409,7 @@ class Model{
     for(let attribute of attributes) {
       if(typeof original[attribute] === 'undefined') {
         throw new Error(`${this.schema.name} has no attribute ${attribute}`);
-      }else if(typeof original[attribute] === 'object' && original[attribute].type === 'uid') {
+      }else if(typeof original[attribute] === 'object' && original[attribute].type === 'uid' && !isUpdate) {
         throw new Error(`${attribute} is a realtion and must be in include.`);
       }
     }

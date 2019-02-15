@@ -512,6 +512,52 @@ User.delete('0x1');
 User.delete(['0x1', '0x2']);
 ```
 
+## Relations
+
+Add relation values
+
+```javascript
+/**
+ * Single 
+ * 
+ * Will add 0x2 as a friend of 0x1
+ */
+await User.update({
+  friend: '0x2'
+}, '0x1');
+
+/**
+ * multiple
+ * 
+ * Will add 0x2, 0x3 as freinds of 0x1
+ */
+await User.update({
+  friend: ['0x2', '0x3']
+}, '0x1');
+```
+
+Delete relation
+
+```javascript
+/**
+ * Single
+ * 
+ * Will remobe 0x2 from 0x1 freiends
+ */
+await User.delete({
+  friend: '0x2'
+}, '0x1');
+
+/**
+ * multiple
+ * 
+ * Will remove 0x2, 0x3 from 0x1 freinds
+ */
+await User.delete({
+  friend: ['0x2', '0x3']
+}, '0x1');
+```
+
 ## Futute releases
 
 * Relation of relation
