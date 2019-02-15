@@ -285,8 +285,6 @@ class Model{
     return new Promise(async (resolve, reject) => {
       const _txn = this.connection.client.newTxn();
 
-      console.log(mutation);
-
       try {
         const mu = new this.connection.dgraph.Mutation();
         mu.setCommitNow(true);
@@ -324,12 +322,10 @@ class Model{
         return this._delete(_uids);
       }
     }else {
-      const _data = {};
-      _data.uid = uid;
+      const _params = {};
+      _params.uid = uid;
 
       this._check_attributes(this.schema.original, Object.keys(params), true);
-
-      const _params = {};
 
       for(let _key of Object.keys(params)) {
         if(this._is_relation(_key)) {
@@ -351,10 +347,7 @@ class Model{
         }
       }
 
-      return this._delete({
-        ..._data,
-        ..._params
-      });
+      return this._delete(_params);
 
     }
   }

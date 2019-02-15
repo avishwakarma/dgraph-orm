@@ -1,6 +1,6 @@
 import grpc from 'grpc';
 
-import dgraph from '../lib';
+import dgraph from '../src';
 
 /**
  * dgraph.connect
@@ -195,5 +195,13 @@ const User = dgraph.model(UserSchema);
   //   }
   // });
 
-  // console.log(users);
+  const users = await User.has('email', {
+    include: {
+      friend: {
+        as: 'friends'
+      }
+    }
+  });
+
+  console.log(users);
 })();
