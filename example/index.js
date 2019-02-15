@@ -1,6 +1,6 @@
 import grpc from 'grpc';
 
-import dgraph from '../src';
+import dgraph from '../lib';
 
 /**
  * dgraph.connect
@@ -194,6 +194,10 @@ const User = dgraph.model(UserSchema);
   //     }
   //   }
   // });
+
+  // await User.delete({
+  //   name: null
+  // }, ['0x271c', '0x2711']);
 
   const users = await User.has('email', {
     include: {

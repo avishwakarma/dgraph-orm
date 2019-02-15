@@ -510,6 +510,24 @@ User.delete('0x1');
  * Will delete the users having uid 0x1 and 0x2
  */
 User.delete(['0x1', '0x2']);
+
+/**
+ * Delete property for single user
+ * 
+ * Will delete user.name from uid 0x1
+ */
+User.delete({
+  name: null
+}, '0x1');
+
+/**
+ * Delete property for mutliple user
+ * 
+ * Will delete user.name from uid 0x1 and 0x2
+ */
+User.delete({
+  name: null
+}, ['0x1', '0x2']);
 ```
 
 ## Relations

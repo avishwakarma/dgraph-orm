@@ -322,8 +322,7 @@ class Model{
         return this._delete(_uids);
       }
     }else {
-      const _params = {};
-      _params.uid = uid;
+      let _params = {};
 
       this._check_attributes(this.schema.original, Object.keys(params), true);
 
@@ -347,6 +346,17 @@ class Model{
         }
       }
 
+      if(Array.isArray(uid)) {
+        const _p = [];
+        uid.forEach(_uid => {
+          _params.uid = _uid;
+          _p.push(_params);
+        });
+
+        return this._delete(_p);
+      }
+
+      _params.uid = uid;
       return this._delete(_params);
 
     }
