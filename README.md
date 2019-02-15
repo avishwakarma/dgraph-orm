@@ -316,7 +316,7 @@ User.regexp(field: String, regex: String, options);
  */
 User.near(field: String, value = {
   latitude: float,
-  longitude: float
+  longitude: float,
   distance: number
 }, options);
 
@@ -338,35 +338,6 @@ User.contains(field: String, value = {
 Every model method acceopts options to filter, paginate and order the nodes
 
 ```javascript
-// Simple filtering
-
-// retrive all nodes having user.name and user.email 'akvlko@gmail.com'
-
-User.has('name', {
-  filter: {
-    email: {
-      $eq: 'akvlko@gmail.com'
-    }
-  }
-});
-
-// OR condition
-
-// retrives all the nodes having user.name where user.email is 'akvlko@gmail.com' or user.name is 'Ashok'
-
-User.has('name', {
-  filter: {
-    $or: {
-      name: {
-        $eq: 'Ashok'
-      },
-      email: {
-        $eq: 'akvlko@gmail.com'
-      }
-    }
-  }
-});
-
 // Specific Attributes
 
 // retrives all the nodes having user.name with their name and email only
@@ -429,6 +400,157 @@ User.has('name', {
       first: 10, // accepts first
       offset: 2, // accepts offset
       after: '0x21' // accepts after
+    }
+  }
+});
+```
+
+## Filter
+
+There are many ways a filter can be applied
+
+```javascript
+/**
+ * Simple
+ * 
+ * Retrive all the nodes having user.email if user.email is akvlko@gmail.com and user.name is Ashok Vishwakarma 
+ */
+User.has('email', {
+  filter: {
+    email: 'akvlko@gmail.com',
+    name: 'Ashok Vishwakarma'
+  }
+});
+
+/**
+ * OR
+ * 
+ * Retrive all the nodes having user.email if user.email is akvlko@gmail.com or user.name is Ashok Vishwakarma 
+ */
+User.has('email', {
+  filter: {
+    $or: {
+      email: 'akvlko@gmail.com',
+      name: 'Ashok Vishwakarma'
+    }
+  }
+});
+
+/**
+ * OR multiple value for same field
+ * 
+ * Retrive all the nodes having user.email if user.email is akvlko@gmail.com or user.email is other@email.com 
+ */
+User.has('email', {
+  filter: {
+    $or: {
+      email: ['akvlko@gmail.com', 'other@email.com']
+    }
+  }
+});
+
+/**
+ * NOT Equal
+ * 
+ * Retrive all the nodes having using user.email if user.email NOT equal to akvlko@gmail.com
+ */
+User.has('email', {
+  filter: {
+    email: {
+      $ne: 'akvlko@gmail.com'
+    }
+  }
+});
+
+/**
+ * Less then equal to
+ * 
+ * Retrive all the nodes having using user.email if user.age is less tnan equal to 32
+ */
+User.has('email', {
+  filter: {
+    age: {
+      $le: 32
+    }
+  }
+});
+
+/**
+ * Greater then equal to
+ * 
+ * Retrive all the nodes having using user.email if user.age is greater tnan equal to 25
+ */
+User.has('email', {
+  filter: {
+    age: {
+      $le: 25
+    }
+  }
+});
+
+/**
+ * Less then
+ * 
+ * Retrive all the nodes having using user.email if user.age is less tnan 25
+ */
+User.has('email', {
+  filter: {
+    age: {
+      $lt: 25
+    }
+  }
+});
+
+/**
+ * Greater then
+ * 
+ * Retrive all the nodes having using user.email if user.age is greater tnan 25
+ */
+User.has('email', {
+  filter: {
+    age: {
+      $gt: 25
+    }
+  }
+});
+
+/**
+ * Any of terms
+ * 
+ * Retrive all the nodes having using user.email and user.name contails 'Ashok' or 'Parinita'
+ */
+User.has('email', {
+  filter: {
+    name: {
+      $anyofterms: 'Ashok Parinita'
+    }
+  }
+});
+
+/**
+ * All of terms
+ * 
+ * Retrive all the nodes having using user.email and user.name contails 'Ashok' and 'Parinita'
+ */
+User.has('email', {
+  filter: {
+    name: {
+      $allofterms: 'Ashok Parinita'
+    }
+  }
+});
+
+/**
+ * Regex
+ * 
+ * Retrive all the nodes having using user.email and user.name mathing with regex /^Ashok.*$/
+ * 
+ * Note: regexp match require trigram index token
+ */
+User.has('email', {
+  filter: {
+    name: {
+      $regexp: '/^Ashok.*$/'
     }
   }
 });
@@ -532,6 +654,25 @@ User.delete({
 
 ## Relations
 
+Fetch relation of relation
+```javascript
+/**
+ * Will fetch all the users alogn with thier friends and friends of friends
+ */
+await User.has('name', {
+  include: {
+    friend: {
+      as: 'friends',
+      include: {
+        friend: {
+          as: 'freinds'
+        }
+      }
+    }
+  }
+});
+```
+
 Add relation values
 
 ```javascript
@@ -578,10 +719,9 @@ await User.delete({
 
 ## Futute releases
 
-* Relation of relation
-* More delete paterns
 * Other geo queries witin, intersects
 * Groupby
+* Aggregation
 
 
 ## Contribution

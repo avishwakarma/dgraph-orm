@@ -59,13 +59,14 @@ const UserSchema = new dgraph.Schema('user', {
   /**
    * Generated Dgraph Schema
    * 
-   * user.name string @index(term) .
+   * user.name string @index(term, trigram) .
    */
   name: {
     type: dgraph.Types.STRING,
     index: true,
     token: {
-      term: true
+      term: true,
+      trigram: true
     }
   },
 
@@ -95,6 +96,15 @@ const UserSchema = new dgraph.Schema('user', {
    * user.bio string .
    */
   bio: dgraph.Types.STRING,
+
+  /**
+   * GeneratedDgraph schema
+   * user.age int @index(int)
+   */
+  age: {
+    type: dgraph.Types.INT,
+    index: true
+  },
 
   /**
    * Generated Dgraph Schema
@@ -180,8 +190,8 @@ const User = dgraph.model(UserSchema);
   // console.log(_check);
 
   // await User.update({
-  //   friend: ['0x2711', '0x271c']
-  // }, '0x1');
+  //   friend: ['0x1', '0x2711']
+  // }, '0x271c');
 
   // await User.delete({
   //   friend: ['0x271c', '0x2711']
@@ -199,10 +209,14 @@ const User = dgraph.model(UserSchema);
   //   name: null
   // }, ['0x271c', '0x2711']);
 
+  // await User.update({
+  //   age: 32
+  // }, '0x271c');
+
   const users = await User.has('email', {
-    include: {
-      friend: {
-        as: 'friends'
+    filter: {
+      name: {
+        $regexp: '/^Ashok.*$/'
       }
     }
   });

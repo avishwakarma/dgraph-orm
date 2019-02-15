@@ -61,20 +61,31 @@ class Query {
   }
 
   _filter(key, value, name) {
+
     if(key.toLowerCase() === '$has') {
       return `${key.replace('$', '')}(${name}.${value})`;
     }
 
-    const _key = Object.keys(value)[0];
+    if(typeof value === 'string') {
+      return `eq(${name}.${key}, "${value}")`; 
+    }
 
-    if(_key) {
-      let _value = value[_key];
+    if(typeof value === 'object' && !Array.isArray(value)) {
+      const _key = Object.keys(value)[0];
 
-      if(typeof _value === 'string' && _key !== '$regexp') {
-        _value = '"' + _value + '"';
+      if(_key) {
+        let _value = value[_key];
+  
+        if(typeof _value === 'string' && _key !== '$regexp') {
+          _value = '"' + _value + '"';
+        }
+
+        if(_key === '$ne') {
+          return `NOT eq(${name}.${key}, ${_value})`; 
+        }else {
+          return `${_key.replace('$', '')}(${name}.${key}, ${_value})`; 
+        }
       }
-
-      return `${_key.replace('$', '')}(${name}.${key}, ${_value})`; 
     }
   }
 
@@ -112,7 +123,13 @@ class Query {
         }else {
           const _sub = []
           Object.keys(filter[_key]).forEach(_k => {
-            _sub.push(this._filter(_k, filter[_key][_k], name))
+            if(Array.isArray(filter[_key][_k])) {
+              filter[_key][_k].forEach(_val => {
+                _sub.push(this._filter(_k, _val, name));
+              });
+            }else {
+              _sub.push(this._filter(_k, filter[_key][_k], name))
+            }
           });
 
           if(_sub.length > 0) {
@@ -174,6 +191,7 @@ class Query {
 
       _inc += `{
         ${this._attributes(include[relation].attributes, include[relation].model)}
+        ${this._include(include[relation].include)}
       }`
     }
 
