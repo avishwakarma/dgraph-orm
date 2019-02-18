@@ -1,6 +1,6 @@
 import grpc from 'grpc';
 
-import dgraph from '../src';
+import dgraph from '../lib';
 
 /**
  * dgraph.connect
@@ -165,7 +165,7 @@ const User = dgraph.model(UserSchema);
   //   password: 'p@ssw0rd'
   // });
 
-  await User.delete(['0x1', '0x3']);
+  // await User.delete(['0x2']);
 
   // await User.update({
   //   name: 'Parinita Sharma',
