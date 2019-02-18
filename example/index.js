@@ -159,11 +159,13 @@ const User = dgraph.model(UserSchema);
 
 (async () => {
   // const user = await User.create({
-  //   name: 'Rahul Singh',
-  //   email: 'rahulsingh0818@gmail.com',
-  //   bio: 'Performance and load tester',
+  //   name: 'Ashok Vishwakarma',
+  //   email: 'akvlko@gmail.com',
+  //   bio: 'Coder, designer professional.',
   //   password: 'p@ssw0rd'
   // });
+
+  // await User.delete('0x1');
 
   // await User.update({
   //   name: 'Parinita Sharma',
@@ -213,13 +215,13 @@ const User = dgraph.model(UserSchema);
   //   age: 32
   // }, '0x271c');
 
-  const users = await User.has('email', {
-    filter: {
-      name: {
-        $regexp: '/^Ashok.*$/'
-      }
-    }
-  });
+  // const users = await User.has('email', {
+  //   filter: {
+  //     name: {
+  //       $regexp: '/^Ashok.*$/'
+  //     }
+  //   }
+  // });
 
-  console.log(users);
+  // console.log(users);
 })();

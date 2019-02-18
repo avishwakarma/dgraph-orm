@@ -307,7 +307,7 @@ class Model{
     if(!uid) {
       if(typeof params === 'string') {
         return this._delete({
-          params
+          uid: params
         });
       }
   
