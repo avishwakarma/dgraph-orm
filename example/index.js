@@ -1,6 +1,6 @@
 import grpc from 'grpc';
 
-import dgraph from '../lib';
+import dgraph from '../src';
 
 /**
  * dgraph.connect
@@ -159,13 +159,13 @@ const User = dgraph.model(UserSchema);
 
 (async () => {
   // const user = await User.create({
-  //   name: 'Ashok Vishwakarma',
-  //   email: 'akvlko@gmail.com',
-  //   bio: 'Coder, designer professional.',
+  //   name: 'Rahul Singh',
+  //   email: 'rahulsingh0818@gmail.com',
+  //   bio: 'Performance and load tester',
   //   password: 'p@ssw0rd'
   // });
 
-  // await User.delete('0x1');
+  await User.delete(['0x1', '0x3']);
 
   // await User.update({
   //   name: 'Parinita Sharma',

@@ -313,7 +313,7 @@ class Model{
   
       if(Array.isArray(params)) {
         const _uids = [];
-        for(let _uid in params) {
+        for(let _uid of params) {
           _uids.push({
             uid: _uid
           });
