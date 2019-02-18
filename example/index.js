@@ -159,8 +159,8 @@ const User = dgraph.model(UserSchema);
 
 (async () => {
   // const user = await User.create({
-  //   name: 'Rahul Singh',
-  //   email: 'rahulsingh0818@gmail.com',
+  //   name: 'Mohit Talwar',
+  //   email: 'mohit@gmail.com',
   //   bio: 'Performance and load tester',
   //   password: 'p@ssw0rd'
   // });

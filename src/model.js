@@ -196,7 +196,6 @@ class Model{
         mu.setIgnoreIndexConflict(true);
         
         const _mutation = await _txn.mutate(mu);
-        await _txn.commit();
 
         const _uid = _mutation.wrappers_[1].get('blank-0');
         const data = await this._method('uid', _uid);
