@@ -107,7 +107,7 @@ class Model{
 
   async query(query) {
     return new Promise(async (resolve, reject) => {
-      const _txn = this.connecton.client.newTxn();
+      const _txn = this.connection.client.newTxn();
 
       try {
         const data = await _txn.query(query);
@@ -196,7 +196,6 @@ class Model{
         mu.setIgnoreIndexConflict(true);
         
         const _mutation = await _txn.mutate(mu);
-        await _txn.commit();
 
         const _uid = _mutation.wrappers_[1].get('blank-0');
         const data = await this._method('uid', _uid);
@@ -307,13 +306,13 @@ class Model{
     if(!uid) {
       if(typeof params === 'string') {
         return this._delete({
-          params
+          uid: params
         });
       }
   
       if(Array.isArray(params)) {
         const _uids = [];
-        for(let _uid in params) {
+        for(let _uid of params) {
           _uids.push({
             uid: _uid
           });
