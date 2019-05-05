@@ -107,7 +107,7 @@ class Model{
 
   async query(query) {
     return new Promise(async (resolve, reject) => {
-      const _txn = this.connecton.client.newTxn();
+      const _txn = this.connection.client.newTxn();
 
       try {
         const data = await _txn.query(query);
