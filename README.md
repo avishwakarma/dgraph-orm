@@ -240,6 +240,22 @@ User.delete(uid: String);
 // Delete multiple uids
 User.delete([uid1: String, uid2: String]);
 
+// Delete edges
+User.delete({
+  friend: ['0x271c', '0x2711']
+}, '0x1');
+
+// Delete values
+User.delete({
+  name: null
+}, '0x1');
+
+// Delete by condition
+// Note: This will delete all the data matching conditions
+User.delete({
+  email: 'akvlko@gmail.com'
+});
+
 /**
  * checkPassword
  * 
@@ -650,6 +666,24 @@ User.delete({
 User.delete({
   name: null
 }, ['0x1', '0x2']);
+
+/**
+ * Delete edges
+ * 
+ * Will delete friend edge 0x271c from user 0x1
+ */
+User.delete({
+  friend: ['0x271c']
+}, '0x1');
+
+/**
+ * Delete by condition
+ * 
+ * Will delete all the matching users (whose name is Ashok in this case)
+ */
+User.delete({
+  name: 'Ashok'
+});
 ```
 
 ## Relations

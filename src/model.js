@@ -1,5 +1,6 @@
 const Query = require('./query');
 const methods = require('./helpers/methods');
+const { pluck } = require('./helpers/utility');
 
 class Model{
   constructor(schema, models, connection, logger) {
@@ -319,6 +320,22 @@ class Model{
         }
   
         return this._delete(_uids);
+      }
+
+      if(typeof params === 'object') {
+
+        const _fields = Object.keys(params);
+
+        const _data = await this._method('has', _fields[0], {
+          attributes: ['uid'],
+          filter: params
+        });
+
+        if(_data.length === 0) {
+          return;
+        }
+
+        return this.delete(pluck(_data, 'uid'));
       }
     }else {
       let _params = {};

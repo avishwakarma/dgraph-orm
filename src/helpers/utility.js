@@ -92,7 +92,24 @@ function prepareSchema(name, options) {
   return name + ': ' + schema + '.';
 }
 
+function pluck(arr, key) {
+  const _data = [];
+
+  if(!Array.isArray(arr)) {
+    return [];
+  }
+
+  for(let obj of arr) {
+    if(typeof obj === 'object' && typeof obj[key] !== 'undefined') {
+      _data.push(obj[key]);
+    }
+  }
+
+  return _data;
+}
+
 module.exports = {
   checkOptions: checkOptions,
-  prepareSchema: prepareSchema
+  prepareSchema: prepareSchema,
+  pluck: pluck
 }

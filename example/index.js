@@ -224,4 +224,12 @@ const User = dgraph.model(UserSchema);
   // });
 
   // console.log(users);
+
+  // User.delete({
+  //   email: 'akvlko@gmail.com'
+  // });
+
+  // await User.delete({
+  //   email: 'test@gmail.com'
+  // });
 })();
