@@ -1,20 +1,18 @@
-const types = require('./types');
-
-const tokenmap = {};
-
-tokenmap[types.STRING] = [
-  'exact',
-  'hash',
-  'term',
-  'fulltext',
-  'trigram'
+"use strict";
+exports.__esModule = true;
+var types_1 = require("./types");
+var tokenmap = {};
+tokenmap[types_1["default"].STRING] = [
+    'exact',
+    'hash',
+    'term',
+    'fulltext',
+    'trigram'
 ];
-
-tokenmap[types.DATETIME] = [
-  'year',
-  'month',
-  'day',
-  'hour'
+tokenmap[types_1["default"].DATETIME] = [
+    'year',
+    'month',
+    'day',
+    'hour'
 ];
-
-module.exports = tokenmap;
+exports["default"] = tokenmap;

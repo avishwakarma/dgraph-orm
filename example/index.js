@@ -1,6 +1,6 @@
 import grpc from 'grpc';
 
-import dgraph from '../lib';
+import dgraph from '../src';
 
 /**
  * dgraph.connect

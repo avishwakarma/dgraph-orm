@@ -1,38 +1,30 @@
-const Schema = require('./schema');
-const Types = require('./helpers/types');
-const Connection = require('./connection');
-const Model = require('./model');
+import Schema from './schema';
+import Types from './helpers/types';
+import Connection from './connection';
+import Model from './model';
 
 class DgraphSchema {
+  private _models: Array<any> = [];
+  private _logger: Function = console.log;
+  private connection: any;
+
   constructor() {
-    this._models = [];
-    this._logger = console.log;
     this.connection = this._create_connection();
-    
-    return {
-      original: this.connection.dgraph,
-      logging: this.logging.bind(this),
-      connect: this.connect.bind(this),
-      Schema: Schema,
-      model: this.model.bind(this),
-      Types: Types,
-      disconnect: this.disconnect.bind(this)
-    }
   }
 
   disconnect() {
     this.connection.close();
   }
 
-  logging(callback) {
+  logging(callback: any) {
     this._logger = callback;
   }
 
-  _log(message) {
+  _log(message: any) {
     this._logger(message);
   }
 
-  async _set_model(schema) {
+  async _set_model(schema: any) {
     if(typeof this._models[schema.name] === 'undefined') {
       this._models[schema.name] = schema.original;
       const op = new this.connection.dgraph.Operation();
@@ -41,21 +33,21 @@ class DgraphSchema {
     }
   }
 
-  _create_connection(config) {
+  private _create_connection(config: any = null): any {
     return new Connection(config, this._log.bind(this));
   }
 
-  model(schema) {
+  model(schema: any) {
     this._set_model(schema);
 
     return new Model(schema, this._models, this.connection, this._log.bind(this));
   }
 
-  connect(config) {
+  connect(config: any) {
     this.connection = this._create_connection(config);
   }
 
-  query(params) {
+  query(params: any) {
     return this.connection.client
       .newTxn()
       .queryWithVars(
@@ -64,7 +56,7 @@ class DgraphSchema {
       );
   }
 
-  mutate(mutation) {
+  mutate(mutation: any) {
     const mu = new this.connection.Mutation();
     mu.setSetJson(mutation);
     return this.connection.client.newTxn()
@@ -72,4 +64,4 @@ class DgraphSchema {
   }
 }
 
-module.exports = new DgraphSchema();
+export default new DgraphSchema();

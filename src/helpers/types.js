@@ -1,67 +1,60 @@
+"use strict";
+exports.__esModule = true;
 /**
  * INT
- * 
+ *
  * dgraph int type
  */
-const INT = 'int';
-
+var INT = 'int';
 /**
  * FLOAT
- * 
+ *
  * dgraph float type
  */
-const FLOAT = 'float';
-
+var FLOAT = 'float';
 /**
  * STRING
- * 
+ *
  * dgraph string type
  */
-const STRING = 'string';
-
+var STRING = 'string';
 /**
  * BOOL
- * 
+ *
  * dgraph bool type
  */
-const BOOL = 'bool';
-
+var BOOL = 'bool';
 /**
  * DATETIME
- * 
+ *
  * dgraph datetime type
  */
-const DATETIME = 'datetime';
-
+var DATETIME = 'datetime';
 /**
  * GEO
- * 
+ *
  * dgraph geo type
  */
-const GEO = 'geo';
-
+var GEO = 'geo';
 /**
  * PASSWORD
- * 
+ *
  * dgraph password type
  */
-const PASSWORD = 'password';
-
+var PASSWORD = 'password';
 /**
  * UID
- * 
+ *
  * dgraph uid type
  */
-const UID = 'uid';
-
-
-module.exports = {
-  INT: INT,
-  FLOAT: FLOAT,
-  STRING: STRING,
-  BOOL: BOOL,
-  DATETIME: DATETIME,
-  GEO: GEO,
-  PASSWORD: PASSWORD,
-  UID: UID
-}
+var UID = 'uid';
+exports["default"] = {
+    INT: INT,
+    FLOAT: FLOAT,
+    STRING: STRING,
+    BOOL: BOOL,
+    DATETIME: DATETIME,
+    GEO: GEO,
+    PASSWORD: PASSWORD,
+    UID: UID
+};

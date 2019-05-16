@@ -1,26 +1,34 @@
 
-const methods = require('./helpers/methods');
+import methods from './helpers/methods';
 
 class Query {
-  constructor(type, field, value, params, name, logger) {
+  private name: any;
+  private params: any;
+  private type: any;
+  private field: any;
+  private value: any;
+  private logger: Function;
+  private where: any;
+
+  constructor(type: any, field: any, value:any, params:any, name:any, logger: Function) {
     this.name = name;
     this.params = params;
     this.type = type;
     this.field = field;
     this.value = value;
     this.logger = logger;
-    
-    return {
-      query: this._compose_params(),
-    };
   }
 
-  _compose_params() {
+  query () {
+    return this._compose_params();
+  }
+
+  private _compose_params() {
     this._where(this.type, this.field, this.value, this.name);
     return this._build(this.params)
   }
 
-  _where(type, field, value, name) {
+  private _where(type: any, field: any, value: any, name: any) {
     let _where = '';
 
     switch (type) {
@@ -60,7 +68,7 @@ class Query {
     this.where = _where;
   }
 
-  _filter(key, value, name) {
+  private _filter(key: any, value: any, name: any) {
 
     if(key.toLowerCase() === '$has') {
       return `${key.replace('$', '')}(${name}.${value})`;
@@ -89,7 +97,7 @@ class Query {
     }
   }
 
-  _parse_first_where(where, name) {
+  private _parse_first_where(where: any, name: any) {
     if(!where) {
       return '';
     }
@@ -112,19 +120,19 @@ class Query {
     return _first;
   }
 
-  _parse_filter(filter, name) {
+  private _parse_filter(filter: any, name: any) {
 
-    const _filters = []
+    const _filters: Array<any> = []
 
     if(typeof filter !== 'undefined') {
       Object.keys(filter).forEach(_key => {
         if(_key.toLowerCase() !== '$and' && _key.toLowerCase() !== '$or') {
           _filters.push(this._filter(_key, filter[_key], name));
         }else {
-          const _sub = []
+          const _sub: Array<any> = []
           Object.keys(filter[_key]).forEach(_k => {
             if(Array.isArray(filter[_key][_k])) {
-              filter[_key][_k].forEach(_val => {
+              filter[_key][_k].forEach((_val: any) => {
                 _sub.push(this._filter(_k, _val, name));
               });
             }else {
@@ -146,7 +154,7 @@ class Query {
     return '';
   }
 
-  _attributes(attributes, name) {
+  private _attributes(attributes: any, name: any) {
     const _attrs = [];
     for(let attr of attributes) {
       if(attr === 'uid') {
@@ -159,7 +167,7 @@ class Query {
     return _attrs.join('\n');
   }
 
-  _include(include) {
+  private _include(include: any) {
     let _inc = '';
 
     if(!include) {
@@ -198,7 +206,7 @@ class Query {
     return _inc;
   }
 
-  _extras(params) {
+  private _extras(params: any) {
     let _extra = [];
 
     if(params.first && typeof params.first === 'number') {
@@ -220,12 +228,12 @@ class Query {
     return '';
   }
 
-  _parse_order(order) {
+  private _parse_order(order: any) {
     const _order = [];
 
     if(order && order.length > 0) {
       if(Array.isArray(order[0])) {
-        order.forEach(_o => {
+        order.forEach((_o: any) => {
           if(typeof _o[1] !== 'undefined') {
             _order.push(`order${_o[1].toLowerCase()}: ${this.name}.${_o[0]}`);
           }
@@ -242,7 +250,7 @@ class Query {
     return '';
   }
 
-  _build(params) {
+  private _build(params: any) {
     let _order = this._parse_order(params.order);
     let _limit = this._extras(params);
 
@@ -267,4 +275,4 @@ class Query {
   }
 }
 
-module.exports = Query;
+export default Query;
