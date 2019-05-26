@@ -12,6 +12,7 @@ export default class Connection {
   config: any;
   clientStub: any;
   client: any;
+  dgraph: any = dgraph;
 
   constructor(config:any = {}, logger: Function = console.log) {
 

@@ -10,6 +10,8 @@ class Query {
   private logger: Function;
   private where: any;
 
+  query: string;
+
   constructor(type: any, field: any, value:any, params:any, name:any, logger: Function) {
     this.name = name;
     this.params = params;
@@ -17,10 +19,7 @@ class Query {
     this.field = field;
     this.value = value;
     this.logger = logger;
-  }
-
-  query () {
-    return this._compose_params();
+    this.query = this._compose_params();
   }
 
   private _compose_params() {

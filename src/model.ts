@@ -101,6 +101,8 @@ class Model {
     
     const query = new Query(type, field, value, params, this.schema.name, this._logger);
 
+    console.log(query);
+
     return this._execute(query.query);
   }
 
@@ -445,6 +447,11 @@ class Model {
   }
  
   _validate(original:any , params: any = {}) {
+    
+    if(!params) {
+      params = {};
+    }
+
     if(!params.attributes || params.attributes.length === 0) {
       params.attributes = this._all_attributes(original);
     }

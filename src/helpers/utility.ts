@@ -2,7 +2,7 @@ import types from './types';
 import typemap from './typemap';
 import tokenmap from './tokenmap';
 
-export function checkOptions(name: any, options: any) {
+export function checkOptions(name: string, options: any) {
   Object.keys(options).forEach(function(key, index){
     if(key === 'type' || typeof options === 'string') return;
 

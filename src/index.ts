@@ -8,6 +8,9 @@ class DgraphSchema {
   private _logger: Function = console.log;
   private connection: any;
 
+  Types: any = Types;
+  Schema: any = Schema;
+
   constructor() {
     this.connection = this._create_connection();
   }
