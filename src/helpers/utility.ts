@@ -1,8 +1,8 @@
-const types = require('./types');
-const tokenmap = require('./tokenmap');
-const typemap = require('./typemap');
+import types from './types';
+import typemap from './typemap';
+import tokenmap from './tokenmap';
 
-function checkOptions(name, options) {
+export function checkOptions(name: string, options: any) {
   Object.keys(options).forEach(function(key, index){
     if(key === 'type' || typeof options === 'string') return;
 
@@ -59,7 +59,8 @@ function checkOptions(name, options) {
     });
   }
 }
-function prepareSchema(name, options) {
+
+export function prepareSchema(name: any, options: any) {
 
   if(typeof options === 'string') {
     return name + ': ' + options + ' .';
@@ -92,7 +93,7 @@ function prepareSchema(name, options) {
   return name + ': ' + schema + '.';
 }
 
-function pluck(arr, key) {
+export function pluck(arr: any, key: any) {
   const _data = [];
 
   if(!Array.isArray(arr)) {
@@ -106,10 +107,4 @@ function pluck(arr, key) {
   }
 
   return _data;
-}
-
-module.exports = {
-  checkOptions: checkOptions,
-  prepareSchema: prepareSchema,
-  pluck: pluck
 }

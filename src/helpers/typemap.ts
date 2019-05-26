@@ -1,6 +1,6 @@
-const types = require('./types');
+import types from './types';
 
-const typemap = {};
+const typemap: {[index: string]: any} = {};
 
 typemap[types.STRING] = ['list', 'count', 'lang', 'index', 'upsert', 'token', 'unique'];
 typemap[types.INT] = ['list', 'count', 'index', 'upsert', 'unique'];
@@ -11,4 +11,4 @@ typemap[types.GEO] = ['list', 'count', 'index', 'upsert'];
 typemap[types.PASSWORD] = [];
 typemap[types.UID] = ['count', 'reverse', 'model'];
 
-module.exports = typemap;
+export default typemap;

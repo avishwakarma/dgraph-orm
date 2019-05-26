@@ -55,13 +55,13 @@ const PASSWORD = 'password';
 const UID = 'uid';
 
 
-module.exports = {
-  INT: INT,
-  FLOAT: FLOAT,
-  STRING: STRING,
-  BOOL: BOOL,
-  DATETIME: DATETIME,
-  GEO: GEO,
-  PASSWORD: PASSWORD,
-  UID: UID
+export default {
+  INT,
+  FLOAT,
+  STRING,
+  BOOL,
+  DATETIME,
+  GEO,
+  PASSWORD,
+  UID
 }

@@ -1,29 +1,27 @@
-const Query = require('./query');
-const methods = require('./helpers/methods');
-const { pluck } = require('./helpers/utility');
+import Query from './query';
+import methods from './helpers/methods';
+import { pluck } from './helpers/utility';
 
-class Model{
-  constructor(schema, models, connection, logger) {
+class Model {
+  [index: string]: any;
+
+  schema: any;
+  models: any;
+  connection: any;
+  
+  private _logger: Function;
+
+  constructor(schema: any, models: any, connection: any, logger: Function) {
     this.schema = schema;
     this.models = models;
     this.connection = connection;
     this._logger = logger;
 
-    const _methods = this._generate_methods()
-    
-    return {
-      schema: this.schema,
-      queryWithVars: this.queryWithVars.bind(this),
-      query: this.query.bind(this),
-      create: this.create.bind(this),
-      update: this.update.bind(this),
-      delete: this.delete.bind(this),
-      checkPassword: this.checkPassword.bind(this),
-      ..._methods
-    }
+    this._generate_methods()
+  
   }
 
-  _check_if_password_type(field) {
+  _check_if_password_type(field: any) {
     const _field = this.schema.original[field];
 
     if(typeof _field === 'undefined') {
@@ -41,7 +39,7 @@ class Model{
     return false;
   }
 
-  async checkPassword(uid, field, password) {
+  async checkPassword(uid: any, field: any, password: any) {
     return new Promise(async (resolve, reject) => {
       try {
 
@@ -49,7 +47,7 @@ class Model{
           throw new Error(`Field ${field} is not of type PASSWORD.`)
         }
 
-        const check = await this._execute(`{
+        const check: any = await this._execute(`{
           ${this.schema.name} (func: uid(${uid})) {
             isValid: checkpwd(${this.schema.name}.${field}, "${password}")
           }
@@ -68,15 +66,15 @@ class Model{
   }
 
   _generate_methods() {
-    const _methods = {};
+    const _methods: {[index: string]: any} = {};
     Object.keys(methods).forEach(_method => {
-      _methods[_method] = this._method.bind(this, _method);
+      Model.prototype[_method] = this._method.bind(this, _method);
     });
 
     return _methods;
   }
 
-  _execute(query) {
+  _execute(query: any) {
     return new Promise(async (resolve, reject) => {
       const _txn = this.connection.client.newTxn();
 
@@ -93,7 +91,7 @@ class Model{
     })
   }
 
-  async _method(type, field, value, params) {    
+  async _method(type: any, field: any, value: any = null, params: any = null) {    
     if(type === methods.uid || type === methods.has) {
       params = value;
       value = field;
@@ -103,10 +101,12 @@ class Model{
     
     const query = new Query(type, field, value, params, this.schema.name, this._logger);
 
+    console.log(query);
+
     return this._execute(query.query);
   }
 
-  async query(query) {
+  async query(query: any) {
     return new Promise(async (resolve, reject) => {
       const _txn = this.connection.client.newTxn();
 
@@ -124,7 +124,7 @@ class Model{
     });
   }
 
-  async queryWithVars(params) {
+  async queryWithVars(params: any) {
     return new Promise(async (resolve, reject) => {
       const _txn = this.connection.client.newTxn();
 
@@ -142,7 +142,7 @@ class Model{
     });
   }
 
-  _is_relation(_key) {
+  _is_relation(_key: any) {
     const _field = this.schema.original[_key];
 
     if(typeof _field !== 'undefined' && _field.type === 'uid') {
@@ -152,14 +152,14 @@ class Model{
     return false;
   }
 
-  _parse_mutation(mutation, name) {
-    let _mutation = {};
+  _parse_mutation(mutation: any, name: any) {
+    let _mutation: {[index: string]: any} = {};
 
     Object.keys(mutation).forEach(_key => {
       if(this._is_relation(_key)) {
         if(Array.isArray(mutation[_key])) {
-          const _m = [];
-          mutation[_key].forEach(_uid => {
+          const _m: any = [];
+          mutation[_key].forEach((_uid: any ) => {
             _m.push({
               uid: _uid
             })
@@ -178,7 +178,7 @@ class Model{
     return _mutation;
   }
 
-  _create(mutation) {
+  _create(mutation: any) {
     return new Promise(async (resolve, reject) => {
       const _txn = this.connection.client.newTxn();
 
@@ -198,8 +198,8 @@ class Model{
         
         const _mutation = await _txn.mutate(mu);
 
-        const _uid = _mutation.wrappers_[1].get('blank-0');
-        const data = await this._method('uid', _uid);
+        const _uid: any = _mutation.wrappers_[1].get('blank-0');
+        const data: any = await this._method('uid', _uid);
 
         return resolve(data[0]);
       } catch (error) {
@@ -211,13 +211,13 @@ class Model{
     });
   }
 
-  async create(data) {
+  async create(data: any) {
     this._check_attributes(this.schema.original, Object.keys(data));
     const mutation = this._parse_mutation(data, this.schema.name);
     return this._create(mutation);
   }
 
-  _update(mutation, uid) {
+  _update(mutation: any, uid: any) {
     return new Promise(async (resolve, reject) => {
       const _txn = this.connection.client.newTxn();
 
@@ -240,7 +240,7 @@ class Model{
     });
   }
 
-  async update(data, uid) {
+  async update(data: any, uid: any) {
 
     if(!uid) {
       return;
@@ -261,7 +261,7 @@ class Model{
       const _keys = Object.keys(uid);
       const _first = _keys.splice(0, 1)[0];
 
-      const _filter = {};
+      const _filter: {[index: string]: any} = {};
 
       if(_keys.length > 0) {
         _keys.forEach(_key => {
@@ -271,7 +271,7 @@ class Model{
         });
       }
       
-      const data = await this._method('eq', _first, uid[_first], {
+      const data: any = await this._method('eq', _first, uid[_first], {
         filter: _filter
       });
 
@@ -281,7 +281,7 @@ class Model{
     }
   }
 
-  _delete(mutation) {
+  _delete(mutation: any): Promise<any> {
     return new Promise(async (resolve, reject) => {
       const _txn = this.connection.client.newTxn();
 
@@ -302,7 +302,7 @@ class Model{
     });
   }
 
-  async delete(params, uid) {
+  async delete(params: any, uid: any = null): Promise<any> {
 
     if(!uid) {
       if(typeof params === 'string') {
@@ -326,7 +326,7 @@ class Model{
 
         const _fields = Object.keys(params);
 
-        const _data = await this._method('has', _fields[0], {
+        const _data: any = await this._method('has', _fields[0], {
           attributes: ['uid'],
           filter: params
         });
@@ -338,15 +338,15 @@ class Model{
         return this.delete(pluck(_data, 'uid'));
       }
     }else {
-      let _params = {};
+      let _params: {[index: string]: any} = {};
 
       this._check_attributes(this.schema.original, Object.keys(params), true);
 
       for(let _key of Object.keys(params)) {
         if(this._is_relation(_key)) {
           if(Array.isArray(params[_key])) {
-            const _a = [];
-            params[_key].forEach(_uid => {
+            const _a: {[index: string]: any} = [];
+            params[_key].forEach((_uid: any ) => {
               _a.push({
                 uid: _uid
               });
@@ -363,7 +363,7 @@ class Model{
       }
 
       if(Array.isArray(uid)) {
-        const _p = [];
+        const _p: any = [];
         uid.forEach(_uid => {
           _params.uid = _uid;
           _p.push(_params);
@@ -379,7 +379,7 @@ class Model{
   }
 
   _get_unique_fields() {
-    const _unique = [];
+    const _unique: any = [];
 
     Object.keys(this.schema.original).forEach(_key => {
       if(this.schema.original[_key].unique) {
@@ -390,7 +390,7 @@ class Model{
     return _unique;
   }
 
-  async _check_unique_values(mutation, _txn) {
+  async _check_unique_values(mutation: any, _txn: any) {
     const _unique = this._get_unique_fields();
 
     if(_unique.length === 0) {
@@ -420,7 +420,7 @@ class Model{
     });
   }
 
-  _check_attributes(original, attributes, isUpdate = false){
+  _check_attributes(original: any, attributes: any, isUpdate: boolean = false){
     if(!attributes || attributes.length === 0) {
       return;
     }
@@ -434,7 +434,7 @@ class Model{
     }
   }
 
-  _all_attributes(original) {
+  _all_attributes(original: any) {
     const _attrs = [];
     for(let attr of Object.keys(original)) {
       if(original[attr].type === 'uid' || original[attr] === 'password' || original[attr].type === 'password') {
@@ -446,7 +446,12 @@ class Model{
     return _attrs;
   }
  
-  _validate(original, params = {}) {
+  _validate(original:any , params: any = {}) {
+    
+    if(!params) {
+      params = {};
+    }
+
     if(!params.attributes || params.attributes.length === 0) {
       params.attributes = this._all_attributes(original);
     }
@@ -477,4 +482,4 @@ class Model{
   }
 }
 
-module.exports = Model;
+export default Model;

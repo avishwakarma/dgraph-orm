@@ -1,6 +1,6 @@
-const types = require('./types');
+import types from './types';
 
-const tokenmap = {};
+const tokenmap: {[index: string]: any} = {};
 
 tokenmap[types.STRING] = [
   'exact',
@@ -17,4 +17,4 @@ tokenmap[types.DATETIME] = [
   'hour'
 ];
 
-module.exports = tokenmap;
+export default tokenmap;

@@ -1,19 +1,25 @@
-const dgraph = require('dgraph-js');
-const grpc = require('grpc');
+import * as dgraph from 'dgraph-js';
+import * as grpc from 'grpc';
 
-const _config = {
+const _config: any = {
   host: '127.0.0.1',
   port: 9080,
   debug: false,
   credentails: grpc.credentials.createInsecure()
 }
 
-class Connection {
-  constructor(config = {}, logger) {
+export default class Connection {
+  config: any;
+  clientStub: any;
+  client: any;
+  dgraph: any = dgraph;
+
+  constructor(config:any = {}, logger: Function = console.log) {
+
     this.config = {
       ..._config,
       ...config
-    };
+    }
 
     try {
       this.clientStub = new dgraph.DgraphClientStub(
@@ -29,17 +35,9 @@ class Connection {
     } catch (error) {
       logger(error);
     }
-
-    return {
-      dgraph: dgraph,
-      client: this.client,
-      close: this.close.bind(this)
-    }
   }
 
   close() {
     this.clientStub.close();
   }
 }
-
-module.exports = Connection;
