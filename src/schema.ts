@@ -3,8 +3,8 @@ import { SchemaFields, FieldProps } from './types';
 
 class Schema {
   name: string;
-  schema: any;
-  original: any;
+  schema: Array<string> ;
+  original: SchemaFields;
   
   constructor(name: string, schema: SchemaFields) {
 
@@ -14,12 +14,12 @@ class Schema {
     this.original = schema;
   }
 
-  private _build(name: string, params: string | FieldProps) {
+  private _build(name: string, params: string | FieldProps): string {
     checkOptions(name, params);
     return prepareSchema(name, params);
   }
 
-  private _generate(name: string, original: SchemaFields) {
+  private _generate(name: string, original: SchemaFields): Array<string> {
     const _schema: Array<string> = [];
     Object.keys(original).forEach((key: string) => {
       _schema.push(name + '.' + this._build(key, original[key]));

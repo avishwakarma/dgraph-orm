@@ -1,9 +1,9 @@
+import { SchemaFields } from './types';
 declare class Schema {
-    private _schema;
     name: string;
-    schema: any;
-    original: any;
-    constructor(name: any, schema: any);
+    schema: Array<string>;
+    original: SchemaFields;
+    constructor(name: string, schema: SchemaFields);
     private _build;
     private _generate;
 }

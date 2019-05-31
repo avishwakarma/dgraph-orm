@@ -1,4 +1,5 @@
 import { Operation } from 'dgraph-js';
+import { Mutation } from 'dgraph-js/generated/api_pb';
 import Schema from './schema';
 import Types from './helpers/types';
 import Connection from './connection';
@@ -42,17 +43,17 @@ class DgraphSchema {
     return new Connection(config, this._log.bind(this));
   }
 
-  model(schema: Schema) {
+  model(schema: Schema): Model {
     this._set_model(schema);
 
     return new Model(schema, this._models, this.connection, this._log.bind(this));
   }
 
-  connect(config: ConnectionConfig) {
+  connect(config: ConnectionConfig): void {
     this.connection = this._create_connection(config);
   }
 
-  query(params: QueryParams) {
+  query(params: QueryParams): Promise<any> {
     return this.connection.client
       .newTxn()
       .queryWithVars(
@@ -61,8 +62,8 @@ class DgraphSchema {
       );
   }
 
-  mutate(mutation: string) {
-    const mu = new this.connection.dgraph.Mutation();
+  mutate(mutation: string): Promise<any> {
+    const mu: Mutation = new this.connection.dgraph.Mutation();
     mu.setSetJson(mutation);
     return this.connection.client.newTxn()
       .mutate(mu);

@@ -410,7 +410,7 @@ User.has('name', {
   include: {
     friend: {
       as: 'freinds',
-      filter: {}, // accept a filter like the above example
+      filter: {}, // accept a filter like the below example
       attributes: ['name', 'email'], // accepts attributes like the abobe example
       order: [], // accepts order like the above example
       first: 10, // accepts first
@@ -559,7 +559,7 @@ User.has('email', {
 /**
  * Regex
  * 
- * Retrive all the nodes having using user.email and user.name mathing with regex /^Ashok.*$/
+ * Retrive all the nodes having user.email and user.name mathing with regex /^Ashok.*$/
  * 
  * Note: regexp match require trigram index token
  */
@@ -567,6 +567,20 @@ User.has('email', {
   filter: {
     name: {
       $regexp: '/^Ashok.*$/'
+    }
+  }
+});
+
+/**
+ * Relation
+ * 
+ * Retrive all the nodes having user.email and user.friend uids
+ * 
+ */
+User.has('email', {
+  filter: {
+    friend: {
+      $uid_in: '0x2711' // or ['0x2711', '0x2712']
     }
   }
 });

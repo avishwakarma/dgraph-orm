@@ -3,7 +3,7 @@ import methods from './helpers/methods';
 import { pluck } from './helpers/utility';
 import Schema from './schema';
 import Connection from './connection';
-import { QueryParams } from './types';
+import { QueryParams, FieldProps } from './types';
 
 import { Mutation } from 'dgraph-js/generated/api_pb';
 import { Txn } from 'dgraph-js';
@@ -27,7 +27,7 @@ class Model {
   
   }
 
-  private _check_if_password_type(field: string) {
+  private _check_if_password_type(field: string): boolean {
     const _field = this.schema.original[field];
 
     if(typeof _field === 'undefined') {
@@ -45,7 +45,7 @@ class Model {
     return false;
   }
 
-  async checkPassword(uid: string, field: string, password: string) {
+  async checkPassword(uid: string, field: string, password: string): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
       try {
 
@@ -97,7 +97,7 @@ class Model {
     })
   }
 
-  private async _method(type: any, field: any, value: any = null, params: any = null): Promise<any> {    
+  private async _method(type: string, field: any, value: any = null, params: any = null): Promise<any> {    
     if(type === methods.uid || type === methods.has) {
       params = value;
       value = field;
@@ -149,7 +149,7 @@ class Model {
   private _is_relation(_key: string): boolean {
     const _field = this.schema.original[_key];
 
-    if(typeof _field !== 'undefined' && _field.type === 'uid') {
+    if(typeof _field !== 'undefined' && typeof _field !== 'string' && _field.type === 'uid') {
       return true;
     }
 
@@ -386,7 +386,8 @@ class Model {
     const _unique: Array<string> = [];
 
     Object.keys(this.schema.original).forEach(_key => {
-      if(this.schema.original[_key].unique) {
+      const _param: string | FieldProps = this.schema.original[_key];
+      if(typeof _param !== 'string' && _param.unique) {
         _unique.push(_key);
       }
     });
@@ -403,8 +404,9 @@ class Model {
       }
 
       for(let _key of _unique) {
-        let _mvalue = mutation[`${this.schema.name}.${_key}`];
-        if(this.schema.original[_key].type === 'string') {
+        let _mvalue: string = mutation[`${this.schema.name}.${_key}`];
+        let _param: string | FieldProps = this.schema.original[_key];
+        if(typeof _param !== 'string' && _param.type === 'string') {
           _mvalue = '"' + _mvalue + '"';
         }
         const _value = await _txn.query(

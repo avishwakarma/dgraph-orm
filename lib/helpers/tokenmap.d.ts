@@ -1,4 +1,4 @@
 declare const tokenmap: {
-    [index: string]: any;
+    [index: string]: Array<string>;
 };
 export default tokenmap;

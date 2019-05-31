@@ -1,4 +1,4 @@
 declare const typemap: {
-    [index: string]: any;
+    [index: string]: Array<string>;
 };
 export default typemap;

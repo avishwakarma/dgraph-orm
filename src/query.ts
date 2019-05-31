@@ -1,35 +1,32 @@
 
 import methods from './helpers/methods';
+import { Params, Include } from './types';
 
 const _conditions: Array<string> = ['$or', '$and'];
 
 class Query {
-  private name: any;
-  private params: any;
-  private type: any;
-  private field: any;
+  private name: string;
+  private params: Params;
+  private type: string;
+  private field: string;
   private value: any;
   private logger: Function;
   private where: any;
 
   query: string;
 
-  constructor(type: any, field: any, value:any, params:any, name:any, logger: Function) {
+  constructor(type: string, field: string, value: any, params: Params, name: string, logger: Function) {
     this.name = name;
     this.params = params;
     this.type = type;
     this.field = field;
     this.value = value;
     this.logger = logger;
-    this.query = this._compose_params();
+    this.where = this._where(this.type, this.field, this.value, this.name);
+    this.query = this._build(this.params)
   }
 
-  private _compose_params() {
-    this._where(this.type, this.field, this.value, this.name);
-    return this._build(this.params)
-  }
-
-  private _where(type: any, field: any, value: any, name: any) {
+  private _where(type: string, field: string, value: any, name: string): string {
     let _where = '';
 
     switch (type) {
@@ -66,10 +63,10 @@ class Query {
       
     }
 
-    this.where = _where;
+    return _where;
   }
 
-  private _filter(key: any, value: any, name: any) {
+  private _filter(key: string, value: any, name: string) {
     if(key.toLowerCase() === '$has') {
       return `${key.replace('$', '')}(${name}.${value})`;
     }
@@ -106,7 +103,7 @@ class Query {
     }
   }
 
-  private _parse_filter(filter: any, name: any) {
+  private _parse_filter(filter: any, name: string) {
 
     const _filters: Array<any> = []
 
@@ -140,7 +137,7 @@ class Query {
     return '';
   }
 
-  private _attributes(attributes: any, name: any) {
+  private _attributes(attributes: Array<string>, name: string) {
     const _attrs = [];
     for(let attr of attributes) {
       if(attr === 'uid') {
@@ -153,8 +150,8 @@ class Query {
     return _attrs.join('\n');
   }
 
-  private _include(include: any) {
-    let _inc = '';
+  private _include(include: Include): string {
+    let _inc: string = '';
 
     if(!include) {
       return _inc;
@@ -168,8 +165,8 @@ class Query {
 
       _inc += `${include[relation].as ? include[relation].as : relation}: ${this.name}.${relation}`;
 
-      const _limit = this._extras(include[relation]);
-      const _order = this._parse_order(include[relation].order);
+      const _limit: string = this._extras(include[relation]);
+      const _order: string = this._parse_order(include[relation].order);
 
       if(include[relation].filter) {
         _inc +=  `${this._parse_filter(include[relation].filter, include[relation].model)}`
@@ -192,7 +189,7 @@ class Query {
     return _inc;
   }
 
-  private _extras(params: any) {
+  private _extras(params: Params): string {
     let _extra = [];
 
     if(params.first && typeof params.first === 'number') {
@@ -214,8 +211,8 @@ class Query {
     return '';
   }
 
-  private _parse_order(order: any) {
-    const _order = [];
+  private _parse_order(order: Array<any>): string {
+    const _order: Array<string> = [];
 
     if(order && order.length > 0) {
       if(Array.isArray(order[0])) {
@@ -236,9 +233,9 @@ class Query {
     return '';
   }
 
-  private _build(params: any) {
-    let _order = this._parse_order(params.order);
-    let _limit = this._extras(params);
+  private _build(params: any): string {
+    let _order: string = this._parse_order(params.order);
+    let _limit: string = this._extras(params);
 
     if(_order) {
       _order = `, ${_order}`;
@@ -248,7 +245,7 @@ class Query {
       _limit = `, ${_limit}`;
     }
 
-    const query = `{
+    const query: string = `{
       ${this.name} ${this.where.replace('{{ORDER}}', _order).replace('{{LIMIT}}', _limit)} ${this._parse_filter(params.filter, this.name)} {
         ${this._attributes(params.attributes, this.name)}
         ${this._include(params.include)}

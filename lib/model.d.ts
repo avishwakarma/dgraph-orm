@@ -1,33 +1,32 @@
+import Schema from './schema';
+import Connection from './connection';
+import { QueryParams } from './types';
 declare class Model {
     [index: string]: any;
-    schema: any;
+    schema: Schema;
     models: any;
-    connection: any;
+    connection: Connection;
     private _logger;
-    constructor(schema: any, models: any, connection: any, logger: Function);
-    _check_if_password_type(field: any): boolean;
-    checkPassword(uid: any, field: any, password: any): Promise<unknown>;
-    _generate_methods(): {
-        [index: string]: any;
-    };
-    _execute(query: any): Promise<unknown>;
-    _method(type: any, field: any, value?: any, params?: any): Promise<unknown>;
-    query(query: any): Promise<unknown>;
-    queryWithVars(params: any): Promise<unknown>;
-    _is_relation(_key: any): boolean;
-    _parse_mutation(mutation: any, name: any): {
-        [index: string]: any;
-    };
-    _create(mutation: any): Promise<unknown>;
-    create(data: any): Promise<unknown>;
-    _update(mutation: any, uid: any): Promise<unknown>;
-    update(data: any, uid: any): Promise<unknown>;
-    _delete(mutation: any): Promise<any>;
+    constructor(schema: Schema, models: any, connection: Connection, logger: Function);
+    private _check_if_password_type;
+    checkPassword(uid: string, field: string, password: string): Promise<any>;
+    private _generate_methods;
+    private _execute;
+    private _method;
+    query(query: string): Promise<any>;
+    queryWithVars(params: QueryParams): Promise<any>;
+    private _is_relation;
+    private _parse_mutation;
+    private _create;
+    create(data: any): Promise<any>;
+    private _update;
+    update(data: any, uid: any): Promise<any>;
+    private _delete;
     delete(params: any, uid?: any): Promise<any>;
-    _get_unique_fields(): any;
-    _check_unique_values(mutation: any, _txn: any): Promise<unknown>;
-    _check_attributes(original: any, attributes: any, isUpdate?: boolean): void;
-    _all_attributes(original: any): string[];
-    _validate(original: any, params?: any): any;
+    private _get_unique_fields;
+    private _check_unique_values;
+    private _check_attributes;
+    private _all_attributes;
+    private _validate;
 }
 export default Model;

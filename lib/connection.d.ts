@@ -1,8 +1,10 @@
+import * as dgraph from 'dgraph-js';
+import { ConnectionConfig } from './types';
 export default class Connection {
-    config: any;
-    clientStub: any;
-    client: any;
+    config: ConnectionConfig;
+    clientStub: dgraph.DgraphClientStub;
+    client: dgraph.DgraphClient;
     dgraph: any;
-    constructor(config?: any, logger?: Function);
+    constructor(config?: ConnectionConfig, logger?: Function);
     close(): void;
 }
