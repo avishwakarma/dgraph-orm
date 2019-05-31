@@ -1,6 +1,6 @@
 {
   "name": "dgraph-orm",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "An ORM for Dgraph",
   "main": "lib/index.js",
   "scripts": {
@@ -17,7 +17,7 @@
     "dgraph-schema"
   ],
   "author": "Ashok Vishwakarma <akvlko@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ashokvishwakarma/dgraph-orm/issues"
   },
