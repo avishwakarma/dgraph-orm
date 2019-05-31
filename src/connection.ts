@@ -1,7 +1,9 @@
 import * as dgraph from 'dgraph-js';
 import * as grpc from 'grpc';
 
-const _config: any = {
+import { ConnectionConfig } from './types';
+
+const _config: ConnectionConfig = {
   host: '127.0.0.1',
   port: 9080,
   debug: false,
@@ -9,12 +11,12 @@ const _config: any = {
 }
 
 export default class Connection {
-  config: any;
-  clientStub: any;
-  client: any;
+  config: ConnectionConfig;
+  clientStub: dgraph.DgraphClientStub;
+  client: dgraph.DgraphClient;
   dgraph: any = dgraph;
 
-  constructor(config:any = {}, logger: Function = console.log) {
+  constructor(config: ConnectionConfig = {}, logger: Function = console.log) {
 
     this.config = {
       ..._config,

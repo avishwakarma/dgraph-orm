@@ -1,17 +1,23 @@
 import Query from './query';
 import methods from './helpers/methods';
 import { pluck } from './helpers/utility';
+import Schema from './schema';
+import Connection from './connection';
+import { QueryParams } from './types';
+
+import { Mutation } from 'dgraph-js/generated/api_pb';
+import { Txn } from 'dgraph-js';
 
 class Model {
   [index: string]: any;
 
-  schema: any;
+  schema: Schema;
   models: any;
-  connection: any;
+  connection: Connection;
   
   private _logger: Function;
 
-  constructor(schema: any, models: any, connection: any, logger: Function) {
+  constructor(schema: Schema, models: any, connection: Connection, logger: Function) {
     this.schema = schema;
     this.models = models;
     this.connection = connection;
@@ -21,7 +27,7 @@ class Model {
   
   }
 
-  _check_if_password_type(field: any) {
+  private _check_if_password_type(field: string) {
     const _field = this.schema.original[field];
 
     if(typeof _field === 'undefined') {
@@ -39,8 +45,8 @@ class Model {
     return false;
   }
 
-  async checkPassword(uid: any, field: any, password: any) {
-    return new Promise(async (resolve, reject) => {
+  async checkPassword(uid: string, field: string, password: string) {
+    return new Promise(async (resolve: Function, reject: Function) => {
       try {
 
         if(!this._check_if_password_type(field)) {
@@ -65,7 +71,7 @@ class Model {
     });
   }
 
-  _generate_methods() {
+  private _generate_methods(): {[index: string]: any} {
     const _methods: {[index: string]: any} = {};
     Object.keys(methods).forEach(_method => {
       Model.prototype[_method] = this._method.bind(this, _method);
@@ -74,8 +80,8 @@ class Model {
     return _methods;
   }
 
-  _execute(query: any) {
-    return new Promise(async (resolve, reject) => {
+  private _execute(query: string): Promise<any> {
+    return new Promise(async (resolve: Function, reject: Function) => {
       const _txn = this.connection.client.newTxn();
 
       try {
@@ -91,7 +97,7 @@ class Model {
     })
   }
 
-  async _method(type: any, field: any, value: any = null, params: any = null) {    
+  private async _method(type: any, field: any, value: any = null, params: any = null): Promise<any> {    
     if(type === methods.uid || type === methods.has) {
       params = value;
       value = field;
@@ -101,14 +107,12 @@ class Model {
     
     const query = new Query(type, field, value, params, this.schema.name, this._logger);
 
-    console.log(query);
-
     return this._execute(query.query);
   }
 
-  async query(query: any) {
-    return new Promise(async (resolve, reject) => {
-      const _txn = this.connection.client.newTxn();
+  async query(query: string): Promise<any> {
+    return new Promise(async (resolve: Function, reject: Function) => {
+      const _txn: Txn = this.connection.client.newTxn();
 
       try {
         const data = await _txn.query(query);
@@ -124,9 +128,9 @@ class Model {
     });
   }
 
-  async queryWithVars(params: any) {
-    return new Promise(async (resolve, reject) => {
-      const _txn = this.connection.client.newTxn();
+  async queryWithVars(params: QueryParams): Promise<any> {
+    return new Promise(async (resolve: Function, reject: Function) => {
+      const _txn: Txn = this.connection.client.newTxn();
 
       try {
         const data = await _txn.queryWithVars(params.query, params.variables);
@@ -142,7 +146,7 @@ class Model {
     });
   }
 
-  _is_relation(_key: any) {
+  private _is_relation(_key: string): boolean {
     const _field = this.schema.original[_key];
 
     if(typeof _field !== 'undefined' && _field.type === 'uid') {
@@ -152,7 +156,7 @@ class Model {
     return false;
   }
 
-  _parse_mutation(mutation: any, name: any) {
+  private _parse_mutation(mutation: any, name: any): {[index: string]: any} {
     let _mutation: {[index: string]: any} = {};
 
     Object.keys(mutation).forEach(_key => {
@@ -178,12 +182,12 @@ class Model {
     return _mutation;
   }
 
-  _create(mutation: any) {
-    return new Promise(async (resolve, reject) => {
+  private _create(mutation: any): Promise<any> {
+    return new Promise(async (resolve: Function, reject: Function) => {
       const _txn = this.connection.client.newTxn();
 
       try {
-        const mu = new this.connection.dgraph.Mutation();
+        const mu: Mutation = new this.connection.dgraph.Mutation();
         mu.setSetJson(mutation);
 
         const _unique_check = await this._check_unique_values(mutation, _txn);
@@ -196,7 +200,7 @@ class Model {
         mu.setCommitNow(true);
         mu.setIgnoreIndexConflict(true);
         
-        const _mutation = await _txn.mutate(mu);
+        const _mutation: any  = await _txn.mutate(mu);
 
         const _uid: any = _mutation.wrappers_[1].get('blank-0');
         const data: any = await this._method('uid', _uid);
@@ -211,14 +215,14 @@ class Model {
     });
   }
 
-  async create(data: any) {
+  async create(data: any): Promise<any> {
     this._check_attributes(this.schema.original, Object.keys(data));
     const mutation = this._parse_mutation(data, this.schema.name);
     return this._create(mutation);
   }
 
-  _update(mutation: any, uid: any) {
-    return new Promise(async (resolve, reject) => {
+  private _update(mutation: any, uid: any): Promise<any> {
+    return new Promise(async (resolve: Function, reject: Function) => {
       const _txn = this.connection.client.newTxn();
 
       try {
@@ -240,7 +244,7 @@ class Model {
     });
   }
 
-  async update(data: any, uid: any) {
+  async update(data: any, uid: any): Promise<any> {
 
     if(!uid) {
       return;
@@ -281,8 +285,8 @@ class Model {
     }
   }
 
-  _delete(mutation: any): Promise<any> {
-    return new Promise(async (resolve, reject) => {
+  private _delete(mutation: any): Promise<any> {
+    return new Promise(async (resolve: Function, reject: Function) => {
       const _txn = this.connection.client.newTxn();
 
       try {
@@ -378,8 +382,8 @@ class Model {
     }
   }
 
-  _get_unique_fields() {
-    const _unique: any = [];
+  private _get_unique_fields(): Array<string> {
+    const _unique: Array<string> = [];
 
     Object.keys(this.schema.original).forEach(_key => {
       if(this.schema.original[_key].unique) {
@@ -390,14 +394,14 @@ class Model {
     return _unique;
   }
 
-  async _check_unique_values(mutation: any, _txn: any) {
-    const _unique = this._get_unique_fields();
+  private async _check_unique_values(mutation: any, _txn: any): Promise<any> {
+    return new Promise(async (resolve: Function, reject: Function) => {
+      const _unique = this._get_unique_fields();
 
-    if(_unique.length === 0) {
-      return false;
-    }
+      if(_unique.length === 0) {
+        return resolve(false);
+      }
 
-    return new Promise(async (resolve, reject) => {
       for(let _key of _unique) {
         let _mvalue = mutation[`${this.schema.name}.${_key}`];
         if(this.schema.original[_key].type === 'string') {
@@ -420,7 +424,7 @@ class Model {
     });
   }
 
-  _check_attributes(original: any, attributes: any, isUpdate: boolean = false){
+  private _check_attributes(original: any, attributes: any, isUpdate: boolean = false){
     if(!attributes || attributes.length === 0) {
       return;
     }
@@ -434,7 +438,7 @@ class Model {
     }
   }
 
-  _all_attributes(original: any) {
+  private _all_attributes(original: any) {
     const _attrs = [];
     for(let attr of Object.keys(original)) {
       if(original[attr].type === 'uid' || original[attr] === 'password' || original[attr].type === 'password') {
@@ -446,7 +450,7 @@ class Model {
     return _attrs;
   }
  
-  _validate(original:any , params: any = {}) {
+  private _validate(original:any , params: any = {}) {
     
     if(!params) {
       params = {};

@@ -1,61 +1,62 @@
+import { TypesType } from "../types";
+
 /**
  * INT
  * 
  * dgraph int type
  */
-const INT = 'int';
+const INT: string = 'int';
 
 /**
  * FLOAT
  * 
  * dgraph float type
  */
-const FLOAT = 'float';
+const FLOAT: string = 'float';
 
 /**
  * STRING
  * 
  * dgraph string type
  */
-const STRING = 'string';
+const STRING: string = 'string';
 
 /**
  * BOOL
  * 
  * dgraph bool type
  */
-const BOOL = 'bool';
+const BOOL: string = 'bool';
 
 /**
  * DATETIME
  * 
  * dgraph datetime type
  */
-const DATETIME = 'datetime';
+const DATETIME: string = 'datetime';
 
 /**
  * GEO
  * 
  * dgraph geo type
  */
-const GEO = 'geo';
+const GEO: string = 'geo';
 
 /**
  * PASSWORD
  * 
  * dgraph password type
  */
-const PASSWORD = 'password';
+const PASSWORD: string = 'password';
 
 /**
  * UID
  * 
  * dgraph uid type
  */
-const UID = 'uid';
+const UID: string = 'uid';
 
-
-export default {
+const Types: TypesType = {
   INT,
   FLOAT,
   STRING,
@@ -65,3 +66,5 @@ export default {
   PASSWORD,
   UID
 }
+
+export default Types;

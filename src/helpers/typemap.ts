@@ -1,6 +1,6 @@
 import types from './types';
 
-const typemap: {[index: string]: any} = {};
+const typemap: {[index: string]: Array<string>} = {};
 
 typemap[types.STRING] = ['list', 'count', 'lang', 'index', 'upsert', 'token', 'unique'];
 typemap[types.INT] = ['list', 'count', 'index', 'upsert', 'unique'];

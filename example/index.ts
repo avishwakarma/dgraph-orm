@@ -1,6 +1,6 @@
 import grpc from 'grpc';
 
-import dgraph from '../lib';
+import dgraph from '../src/';
 
 /**
  * dgraph.connect
@@ -215,15 +215,15 @@ const User = dgraph.model(UserSchema);
   //   age: 32
   // }, '0x271c');
 
-  // const users = await User.has('email', {
-  //   filter: {
-  //     name: {
-  //       $regexp: '/^Ashok.*$/'
-  //     }
-  //   }
-  // });
+  const users = await User.has('email', {
+    filter: {
+      friend: {
+        $uid_in: ['0x2711', '0x271c']
+      }
+    }
+  });
 
-  // console.log(users);
+  console.log(users);
 
   // User.delete({
   //   email: 'akvlko@gmail.com'

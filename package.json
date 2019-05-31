@@ -5,8 +5,8 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepare": "tsc -d",
-    "start": "nodemon example --exec babel-node"
+    "prepare": "tsc -p",
+    "start": "nodemon -e ts example --exec ts-node"
   },
   "repository": {
     "type": "git",
@@ -25,11 +25,7 @@
   "devDependencies": {
     "@types/google-protobuf": "^3.2.7",
     "@types/node": "^12.0.2",
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "install": "^0.12.2",
     "nodemon": "^1.19.1",
-    "npm": "^6.9.0",
     "ts-node": "^8.1.0",
     "typescript": "^3.4.5"
   },
@@ -37,10 +33,5 @@
     "dgraph-js": "^1.2.1",
     "grpc": "^1.20.3",
     "protobufjs": "^6.8.8"
-  },
-  "babel": {
-    "presets": [
-      "env"
-    ]
   }
 }

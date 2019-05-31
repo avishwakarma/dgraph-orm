@@ -1,6 +1,8 @@
 
 import methods from './helpers/methods';
 
+const _conditions: Array<string> = ['$or', '$and'];
+
 class Query {
   private name: any;
   private params: any;
@@ -68,7 +70,6 @@ class Query {
   }
 
   private _filter(key: any, value: any, name: any) {
-
     if(key.toLowerCase() === '$has') {
       return `${key.replace('$', '')}(${name}.${value})`;
     }
@@ -82,6 +83,15 @@ class Query {
 
       if(_key) {
         let _value = value[_key];
+        
+        if(Array.isArray(_value)) {
+          const _sub: Array<string> = [];
+          _value.forEach((_val: any) => {
+            _sub.push(`uid_in(${name}.${key}, ${_val})`);
+          });
+
+          return _sub.join(' OR ');
+        }
   
         if(typeof _value === 'string' && _key !== '$regexp') {
           _value = '"' + _value + '"';
@@ -89,34 +99,11 @@ class Query {
 
         if(_key === '$ne') {
           return `NOT eq(${name}.${key}, ${_value})`; 
-        }else {
-          return `${_key.replace('$', '')}(${name}.${key}, ${_value})`; 
         }
+
+        return `${_key.replace('$', '')}(${name}.${key}, ${_value})`; 
       }
     }
-  }
-
-  private _parse_first_where(where: any, name: any) {
-    if(!where) {
-      return '';
-    }
-
-    let _first = '';
-    const _first_key = Object.keys(where)[0];
-    
-
-    if(_first_key === '$uid') {
-      _first = `uid(${where[_first_key]})`;
-    }else {
-      const _key_name = Object.keys(where[_first_key])[0];
-      let _value = where[_first_key][_key_name];
-      if(typeof _value === 'string' && _key_name.toLowerCase() !== '$regexp') {
-        _value = '"' + _value + '"';
-      }
-      _first = `${_key_name.replace('$', '')}(${name}.${_first_key}, ${_value})`
-    }
-
-    return _first;
   }
 
   private _parse_filter(filter: any, name: any) {
@@ -125,17 +112,17 @@ class Query {
 
     if(typeof filter !== 'undefined') {
       Object.keys(filter).forEach(_key => {
-        if(_key.toLowerCase() !== '$and' && _key.toLowerCase() !== '$or') {
+        if(_conditions.indexOf(_key.toLowerCase()) === -1) {
           _filters.push(this._filter(_key, filter[_key], name));
-        }else {
-          const _sub: Array<any> = []
+        } else {
+          const _sub: Array<string> = [];
           Object.keys(filter[_key]).forEach(_k => {
             if(Array.isArray(filter[_key][_k])) {
               filter[_key][_k].forEach((_val: any) => {
                 _sub.push(this._filter(_k, _val, name));
-              });
+              })
             }else {
-              _sub.push(this._filter(_k, filter[_key][_k], name))
+              _sub.push(this._filter(_k, filter[_key][_k], name));
             }
           });
 

@@ -1,3 +1,5 @@
+import { MethodsType } from "../types";
+
 const eq: string = 'eq';
 
 const uid: string = 'uid';
@@ -18,7 +20,7 @@ const near: string = 'near';
 
 const contains: string = 'contains';
 
-export default {
+const Methods: MethodsType = {
   eq,
   uid,
   allofterms,
@@ -30,3 +32,4 @@ export default {
   near,
   contains
 }
+export default Methods;

@@ -1,30 +1,31 @@
 import { prepareSchema, checkOptions } from './helpers/utility';
+import { SchemaFields, FieldProps } from './types';
 
 class Schema {
-  private _schema: Array<any>;
   name: string;
   schema: any;
   original: any;
   
-  constructor(name: any, schema: any) {
-    this._schema = [];
+  constructor(name: string, schema: SchemaFields) {
 
-    this._generate(name, schema);
+    this.schema = this._generate(name, schema);
 
     this.name = name;
-    this.schema = this._schema;
     this.original = schema;
   }
 
- private _build(name: string, params: any) {
+  private _build(name: string, params: string | FieldProps) {
     checkOptions(name, params);
     return prepareSchema(name, params);
   }
 
-  private _generate(name: string, original: any) {
-    Object.keys(original).forEach((key) => {
-      this._schema.push(name + '.' + this._build(key, original[key]));
+  private _generate(name: string, original: SchemaFields) {
+    const _schema: Array<string> = [];
+    Object.keys(original).forEach((key: string) => {
+      _schema.push(name + '.' + this._build(key, original[key]));
     });
+
+    return _schema;
   }
 }
 

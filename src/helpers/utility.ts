@@ -1,9 +1,10 @@
 import types from './types';
 import typemap from './typemap';
 import tokenmap from './tokenmap';
+import { FieldProps } from '../types';
 
-export function checkOptions(name: string, options: any) {
-  Object.keys(options).forEach(function(key, index){
+export const checkOptions = (name: string, options: string | FieldProps): void => {
+  Object.keys(options).forEach((key: string) => {
     if(key === 'type' || typeof options === 'string') return;
 
     if(typemap[options.type].indexOf(key) === -1) {
@@ -35,11 +36,11 @@ export function checkOptions(name: string, options: any) {
     throw new Error('[Type Error]: In ' + name + ' of type ' + options.type.toUpperCase() + ', token must be a string.');
   }
 
-  if(options.type === types.DATETIME && options.index && tokenmap[types.DATETIME].indexOf(options.token) === -1) {
+  if(options.type === types.DATETIME && options.index && typeof options.token === 'string' && tokenmap[types.DATETIME].indexOf(options.token) === -1) {
     throw new Error('[Type Error]: In ' + name + ' of type ' + options.type.toUpperCase() + ', token must be any one of ' + tokenmap[types.DATETIME].join(', ') + '.');
   }
 
-  if(options.token && options.type !== types.DATETIME) {
+  if(options.token && typeof options.token !== 'string' && options.type !== types.DATETIME) {
     if(options.token.exact && options.token.hash) {
       throw new Error('[Type Error]: In ' + name + ' of type ' + options.type.toUpperCase() + ', exact and hash index types shouldn\'t be used together.');
     }
@@ -52,7 +53,7 @@ export function checkOptions(name: string, options: any) {
       throw new Error('[Type Error]: In ' + name + ' of type ' + options.type.toUpperCase() + ', exact or hash index types shouldn\'t be used alongside the term index type.');
     }
 
-    Object.keys(options.token).forEach(function(key) {
+    Object.keys(options.token).forEach((key: string) => {
       if(tokenmap[options.type].indexOf(key) === -1) {
         throw new Error('[Type Error]: In ' + name + ' of type ' + options.type.toUpperCase() + ', for token only ' + tokenmap[options.type].join(', ') + ' are allowd.');
       }
@@ -60,13 +61,13 @@ export function checkOptions(name: string, options: any) {
   }
 }
 
-export function prepareSchema(name: any, options: any) {
+export const prepareSchema = (name: string, options: string | FieldProps): string => {
 
   if(typeof options === 'string') {
     return name + ': ' + options + ' .';
   }
 
-  let schema = options.type + ' ';
+  let schema: string = options.type + ' ';
 
   if(options.list) {
     schema = '[' + schema + '] ';
@@ -82,7 +83,7 @@ export function prepareSchema(name: any, options: any) {
     }
   }
 
-  Object.keys(options).forEach(function(key){
+  Object.keys(options).forEach((key: string) => {
     if(key === 'type' || key === 'list' || key === 'index' || key === 'token' || key === 'model' || key === 'unique') {
       return;
     }
@@ -93,7 +94,7 @@ export function prepareSchema(name: any, options: any) {
   return name + ': ' + schema + '.';
 }
 
-export function pluck(arr: any, key: any) {
+export const pluck = (arr: any, key: any): Array<any> => {
   const _data = [];
 
   if(!Array.isArray(arr)) {

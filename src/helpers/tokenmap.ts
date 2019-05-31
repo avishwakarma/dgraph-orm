@@ -1,6 +1,6 @@
 import types from './types';
 
-const tokenmap: {[index: string]: any} = {};
+const tokenmap: {[index: string]: Array<string>} = {};
 
 tokenmap[types.STRING] = [
   'exact',
