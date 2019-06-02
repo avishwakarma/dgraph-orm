@@ -12,14 +12,14 @@ class Model {
   [index: string]: any;
 
   schema: Schema;
-  models: any;
   connection: Connection;
-  
+
+  private _models: any;
   private _logger: Function;
 
   constructor(schema: Schema, models: any, connection: Connection, logger: Function) {
     this.schema = schema;
-    this.models = models;
+    this._models = models;
     this.connection = connection;
     this._logger = logger;
 
@@ -71,13 +71,10 @@ class Model {
     });
   }
 
-  private _generate_methods(): {[index: string]: any} {
-    const _methods: {[index: string]: any} = {};
+  private _generate_methods(): void {
     Object.keys(methods).forEach(_method => {
       Model.prototype[_method] = this._method.bind(this, _method);
     });
-
-    return _methods;
   }
 
   private _execute(query: string): Promise<any> {
@@ -480,7 +477,7 @@ class Model {
 
         params.include[relation].model = original[relation].model;
 
-        this._validate(this.models[original[relation].model], params.include[relation]);
+        this._validate(this._models[original[relation].model], params.include[relation]);
       }
     }
 
