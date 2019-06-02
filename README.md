@@ -74,8 +74,8 @@ https://ashokvishwakarma.github.io/dgraph-orm
 
 ## Futute releases
 
-* Other geo queries witin, intersects
-* Groupby
+* Other geo queries within, intersects
+* Group by
 * Aggregation
 
 
