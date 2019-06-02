@@ -4,8 +4,8 @@ import { QueryParams } from './types';
 declare class Model {
     [index: string]: any;
     schema: Schema;
-    models: any;
     connection: Connection;
+    private _models;
     private _logger;
     constructor(schema: Schema, models: any, connection: Connection, logger: Function);
     private _check_if_password_type;
