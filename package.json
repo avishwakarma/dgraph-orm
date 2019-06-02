@@ -1,7 +1,7 @@
 {
   "name": "dgraph-orm",
-  "version": "1.1.6",
-  "description": "An ORM for Dgraph",
+  "version": "1.1.7",
+  "description": "Simplified schema creation, queries and mutations for Dgraph.",
   "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -21,7 +21,7 @@
   "bugs": {
     "url": "https://github.com/ashokvishwakarma/dgraph-orm/issues"
   },
-  "homepage": "https://github.com/ashokvishwakarma/dgraph-orm#readme",
+  "homepage": "https://ashokvishwakarma.github.io/dgraph-orm",
   "devDependencies": {
     "@types/google-protobuf": "^3.2.7",
     "@types/node": "^12.0.2",

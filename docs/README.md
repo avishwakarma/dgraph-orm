@@ -1,5 +1,5 @@
 # dgraph-orm
-Simplified schema creation, queries and mutation for Dgraph.
+Simplified schema creation, queries and mutations for Dgraph.
 
 ## Install
 

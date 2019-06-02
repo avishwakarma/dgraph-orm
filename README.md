@@ -1,9 +1,5 @@
-# DgraphORM
-An ORM for Dgraph
-
-## What its all about
-
-DgraphORM is a package to simplify the schema creation for Dgraph similar to Mongoose, Sequilize and etc.
+# dgraph-orm
+Simplified schema creation, queries and mutations for Dgraph.
 
 ## Installation
 
@@ -11,7 +7,11 @@ DgraphORM is a package to simplify the schema creation for Dgraph similar to Mon
 npm install dgraph-orm
 ```
 
-## Sample schema
+## Full Documentation
+
+https://ashokvishwakarma.github.io/dgraph-orm
+
+## Your first schema and model
 
 ```javascript
 import dgraph from 'dgraph-orm';
