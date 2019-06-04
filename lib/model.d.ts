@@ -10,7 +10,16 @@ declare class Model {
     constructor(schema: Schema, models: any, connection: Connection, logger: Function);
     private _check_if_password_type;
     checkPassword(uid: string, field: string, password: string): Promise<any>;
-    private _generate_methods;
+    eq(field: any, value?: any, params?: any): Promise<any>;
+    uid(field: any, value?: any, params?: any): Promise<any>;
+    allofterms(field: any, value?: any, params?: any): Promise<any>;
+    anyofterms(field: any, value?: any, params?: any): Promise<any>;
+    regexp(field: any, value?: any, params?: any): Promise<any>;
+    anyoftext(field: any, value?: any, params?: any): Promise<any>;
+    alloftext(field: any, value?: any, params?: any): Promise<any>;
+    has(field: any, value?: any, params?: any): Promise<any>;
+    near(field: any, value?: any, params?: any): Promise<any>;
+    contains(field: any, value?: any, params?: any): Promise<any>;
     private _execute;
     private _method;
     query(query: string): Promise<any>;

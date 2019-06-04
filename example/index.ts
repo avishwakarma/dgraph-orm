@@ -126,6 +126,17 @@ const UserSchema = new dgraph.Schema('user', {
  */
 const User = dgraph.model(UserSchema);
 
+const PostSchema = new dgraph.Schema('post', {
+  title: dgraph.Types.STRING,
+  content: dgraph.Types.STRING,
+  author: {
+    type: dgraph.Types.UID,
+    model: 'user'
+  }
+});
+
+const Post = dgraph.model(PostSchema);
+
 /**
  * @example
  * 
@@ -215,15 +226,12 @@ const User = dgraph.model(UserSchema);
   //   age: 32
   // }, '0x271c');
 
-  // const users = await User.has('email', {
-  //   filter: {
-  //     friend: {
-  //       $uid_in: '0x2711'
-  //     }
-  //   }
-  // });
+  // const users = await User.has('email');
+
+  // const posts = await Post.has('title');
 
   // console.log(users);
+  // console.log(posts);
 
   // User.delete({
   //   email: 'akvlko@gmail.com'
@@ -232,4 +240,5 @@ const User = dgraph.model(UserSchema);
   // await User.delete({
   //   email: 'test@gmail.com'
   // });
+
 })();

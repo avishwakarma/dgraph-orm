@@ -23,8 +23,7 @@ class Model {
     this.connection = connection;
     this._logger = logger;
 
-    this._generate_methods()
-  
+    // this._generate_methods();
   }
 
   private _check_if_password_type(field: string): boolean {
@@ -71,10 +70,50 @@ class Model {
     });
   }
 
-  private _generate_methods(): void {
-    Object.keys(methods).forEach(_method => {
-      Model.prototype[_method] = this._method.bind(this, _method);
-    });
+  // private _generate_methods(): void {
+  //   Object.keys(methods).forEach(_method => {
+  //     Model.prototype[_method] = this._method.bind(this, _method);
+  //   });
+  // }
+
+  async eq(field: any, value: any = null, params: any = null): Promise<any> {
+    return this._method('eq', field, value, params)
+  }
+
+  async uid(field: any, value: any = null, params: any = null): Promise<any> {
+    return this._method('uid', field, value, params)
+  }
+
+  async allofterms(field: any, value: any = null, params: any = null): Promise<any> {
+    return this._method('allofterms', field, value, params)
+  }
+  
+  async anyofterms(field: any, value: any = null, params: any = null): Promise<any> {
+    return this._method('anyofterms', field, value, params)
+  }
+  
+  async regexp(field: any, value: any = null, params: any = null): Promise<any> {
+    return this._method('reghexp', field, value, params)
+  }
+  
+  async anyoftext(field: any, value: any = null, params: any = null): Promise<any> {
+    return this._method('anyoftext', field, value, params)
+  }
+  
+  async alloftext(field: any, value: any = null, params: any = null): Promise<any> {
+    return this._method('alloftext', field, value, params)
+  }
+  
+  async has(field: any, value: any = null, params: any = null): Promise<any> {
+    return this._method('has', field, value, params)
+  }
+
+  async near(field: any, value: any = null, params: any = null): Promise<any> {
+    return this._method('near', field, value, params)
+  }
+
+  async contains(field: any, value: any = null, params: any = null): Promise<any> {
+    return this._method('contains', field, value, params)
   }
 
   private _execute(query: string): Promise<any> {
@@ -94,12 +133,12 @@ class Model {
     })
   }
 
-  private async _method(type: string, field: any, value: any = null, params: any = null): Promise<any> {    
+  private async _method(type: string, field: any, value: any = null, params: any = null): Promise<any> {        
     if(type === methods.uid || type === methods.has) {
       params = value;
       value = field;
     }
-    
+
     params = this._validate(this.schema.original, params);
     
     const query = new Query(type, field, value, params, this.schema.name, this._logger);

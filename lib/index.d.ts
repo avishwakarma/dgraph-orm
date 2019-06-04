@@ -2,7 +2,6 @@ import Schema from './schema';
 import Model from './model';
 import { TypesType, SchemaFields, ConnectionConfig, QueryParams } from './types';
 declare class DgraphSchema {
-    private _models;
     private _logger;
     private connection;
     Types: TypesType;
@@ -13,7 +12,8 @@ declare class DgraphSchema {
     disconnect(): void;
     logging(callback: Function): void;
     _log(message: string): void;
-    _set_model(schema: Schema): Promise<void>;
+    _set_model(schema: Schema): void;
+    _generate_schema(schema: Array<string>): Promise<void>;
     private _create_connection;
     model(schema: Schema): Model;
     connect(config: ConnectionConfig): void;
