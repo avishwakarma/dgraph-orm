@@ -1,6 +1,6 @@
 import grpc from 'grpc';
 
-import dgraph from '../lib';
+import dgraph from '../src';
 
 /**
  * dgraph.connect
@@ -226,12 +226,12 @@ const Post = dgraph.model(PostSchema);
   //   age: 32
   // }, '0x271c');
 
-  // const users = await User.has('email');
+  const users = await User.has('email');
 
-  // const posts = await Post.has('title');
+  const posts = await Post.has('title');
 
-  // console.log(users);
-  // console.log(posts);
+  console.log(users);
+  console.log(posts);
 
   // User.delete({
   //   email: 'akvlko@gmail.com'
