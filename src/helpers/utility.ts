@@ -1,8 +1,23 @@
+/**
+ * utility
+ * 
+ * dgraph-orm utilities
+ * 
+ * @author Ashok Vishwakarma <akvlko@gmail.com>
+ */
+
 import types from './types';
 import typemap from './typemap';
 import tokenmap from './tokenmap';
 import { FieldProps } from '../types';
 
+/**
+ * checkOptions
+ * @param name {string}
+ * @param options {string | FieldProps}
+ * 
+ * @returns void
+ */
 export const checkOptions = (name: string, options: string | FieldProps): void => {
   Object.keys(options).forEach((key: string) => {
     if(key === 'type' || typeof options === 'string') return;
@@ -61,6 +76,13 @@ export const checkOptions = (name: string, options: string | FieldProps): void =
   }
 }
 
+/**
+ * prepareSchema
+ * @param name {string}
+ * @param options {string | FieldProps}
+ * 
+ * @returns string
+ */
 export const prepareSchema = (name: string, options: string | FieldProps): string => {
 
   if(typeof options === 'string') {
@@ -94,8 +116,15 @@ export const prepareSchema = (name: string, options: string | FieldProps): strin
   return name + ': ' + schema + '.';
 }
 
-export const pluck = (arr: any, key: any): Array<any> => {
-  const _data = [];
+/**
+ * pluck
+ * @param arr Array<any>
+ * @param key string
+ * 
+ * @returns Array<string>
+ */
+export const pluck = (arr: Array<any>, key: string): Array<any> => {
+  const _data: Array<any> = [];
 
   if(!Array.isArray(arr)) {
     return [];

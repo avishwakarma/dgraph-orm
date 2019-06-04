@@ -1,20 +1,100 @@
 
+/**
+ * Query
+ * 
+ * dgraph-orm Query class
+ * 
+ * @author Ashok Vishwakarma <akvlko@gmail.com>
+ */
+
+/**
+ * methods
+ * 
+ * dgraph-orm model methods
+ */
 import methods from './helpers/methods';
+
 import { Params, Include } from './types';
 
+/**
+ * _conditions
+ * 
+ * @type Array<string>
+ */
 const _conditions: Array<string> = ['$or', '$and'];
 
+/**
+ * Query
+ * 
+ * Class Query
+ */
 class Query {
+
+  /**
+   * name
+   * 
+   * @type string
+   */
   private name: string;
+
+  /**
+   * params
+   * 
+   * @type Params
+   */
   private params: Params;
+
+  /**
+   * type
+   * 
+   * @type string
+   */
   private type: string;
+
+  /**
+   * field
+   * 
+   * @type string
+   */
   private field: string;
+
+  /**
+   * value
+   * 
+   * @type any
+   */
   private value: any;
+
+  /**
+   * logger
+   * 
+   * @type Function
+   */
   private logger: Function;
+
+  /**
+   * where
+   * 
+   * @type any
+   */
   private where: any;
 
+  /**
+   * query
+   * 
+   * @type string
+   */
   query: string;
 
+  /**
+   * constructor
+   * @param type {string}
+   * @param field {string}
+   * @param value {any}
+   * @param params {Params}
+   * @param name {string}
+   * @param logger {Function}
+   */
   constructor(type: string, field: string, value: any, params: Params, name: string, logger: Function) {
     this.name = name;
     this.params = params;
@@ -26,6 +106,15 @@ class Query {
     this.query = this._build(this.params)
   }
 
+  /**
+   * _where
+   * @param type {string} 
+   * @param field {string}
+   * @param value {any}
+   * @param name {string}
+   * 
+   * @returns string
+   */
   private _where(type: string, field: string, value: any, name: string): string {
     let _where = '';
 
@@ -66,7 +155,15 @@ class Query {
     return _where;
   }
 
-  private _filter(key: string, value: any, name: string) {
+  /**
+   * _filter
+   * @param key {string} 
+   * @param value {any}
+   * @param name {string}
+   * 
+   * @returns string
+   */
+  private _filter(key: string, value: any, name: string): string {
     if(key.toLowerCase() === '$has') {
       return `${key.replace('$', '')}(${name}.${value})`;
     }
@@ -103,7 +200,14 @@ class Query {
     }
   }
 
-  private _parse_filter(filter: any, name: string) {
+  /**
+   * _parse_filter
+   * @param filter {any} 
+   * @param name {string}
+   * 
+   * @returns string
+   */
+  private _parse_filter(filter: any, name: string): string {
 
     const _filters: Array<any> = []
 
@@ -137,8 +241,15 @@ class Query {
     return '';
   }
 
-  private _attributes(attributes: Array<string>, name: string) {
-    const _attrs = [];
+  /**
+   * _attributes
+   * @param attributes {Array<string>}
+   * @param name {string}
+   * 
+   * @return string
+   */
+  private _attributes(attributes: Array<string>, name: string): string {
+    const _attrs: Array<string> = [];
     for(let attr of attributes) {
       if(attr === 'uid') {
         _attrs.push('uid');
@@ -150,6 +261,12 @@ class Query {
     return _attrs.join('\n');
   }
 
+  /**
+   * _include
+   * @param include {Include}
+   * 
+   * @returns string
+   */
   private _include(include: Include): string {
     let _inc: string = '';
 
@@ -189,6 +306,12 @@ class Query {
     return _inc;
   }
 
+  /**
+   * _extra
+   * @param params {Params}
+   * 
+   * @return string
+   */
   private _extras(params: Params): string {
     let _extra = [];
 
@@ -211,6 +334,12 @@ class Query {
     return '';
   }
 
+  /**
+   * _parse_order
+   * @param order {Array<string>}
+   * 
+   * @returns string 
+   */
   private _parse_order(order: Array<any>): string {
     const _order: Array<string> = [];
 
@@ -233,6 +362,12 @@ class Query {
     return '';
   }
 
+  /**
+   * _build
+   * @param params {any}
+   * 
+   * @returns string
+   */
   private _build(params: any): string {
     let _order: string = this._parse_order(params.order);
     let _limit: string = this._extras(params);

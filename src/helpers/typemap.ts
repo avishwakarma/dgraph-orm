@@ -1,3 +1,11 @@
+/**
+ * typemap
+ * 
+ * dgraph-orm type map
+ * 
+ * @author Ashok Vishwakarma <akvlko@gmail.com>
+ */
+
 import types from './types';
 
 const typemap: {[index: string]: Array<string>} = {};

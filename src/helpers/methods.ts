@@ -1,3 +1,11 @@
+/**
+ * methods
+ * 
+ * dgraph-orm Model methods
+ * 
+ * @author Ashok Vishwakarma <akvlko@gmail.com>
+ */
+
 import { MethodsType } from "../types";
 
 const eq: string = 'eq';

@@ -1,3 +1,11 @@
+/**
+ * tokenmap
+ * 
+ * dgraph-orm token maps
+ * 
+ * @author Ashok Vishwakarma <akvlko@gmail.com>
+ */
+
 import types from './types';
 
 const tokenmap: {[index: string]: Array<string>} = {};

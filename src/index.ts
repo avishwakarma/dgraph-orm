@@ -3,8 +3,9 @@
  * 
  * Simplified schema creation, queries and mutations for Dgraph.
  * 
- * @uses npm install dgraph-orm
+ * @author Ashok Vishwakarma <akvlko@gmail.com>
  * 
+ * @uses npm install dgraph-orm
  * @docs https://ashokvishwakarma.github.io/dgraph-orm
  * 
  */

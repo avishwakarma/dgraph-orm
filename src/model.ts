@@ -1,22 +1,108 @@
-import Query from './query';
-import methods from './helpers/methods';
-import { pluck } from './helpers/utility';
-import Schema from './schema';
-import Connection from './connection';
-import { QueryParams, FieldProps } from './types';
+/**
+ * Model
+ * 
+ * dgraph-orm Model class
+ * 
+ * @author Ashok Vishwakarma <akvlko@gmail.com>
+ */
 
+/**
+ * Query
+ * 
+ * dgraph-orm Query class
+ */
+import Query from './query';
+
+/**
+ * methods
+ * 
+ * dgraph-orm model methods
+ */
+import methods from './helpers/methods';
+
+/**
+ * pluck
+ * 
+ * pluck utility method
+ */
+import { pluck } from './helpers/utility';
+
+/**
+ * Schema
+ * 
+ * dgraph-orm Schema class
+ */
+import Schema from './schema';
+
+/**
+ * Connection
+ * 
+ * dgraph-orm Connection class
+ */
+import Connection from './connection';
+
+import { QueryParams, FieldProps, Params } from './types';
+
+/**
+ * Mutation
+ * 
+ * Type Mutation from dgraph-js
+ */
 import { Mutation } from 'dgraph-js/generated/api_pb';
+
+/**
+ * Txn
+ * 
+ * Type Txn from dgraph-js
+ */
 import { Txn } from 'dgraph-js';
 
+/**
+ * Model
+ * 
+ * Class Model
+ */
 class Model {
+  /**
+   * index type support
+   */
   [index: string]: any;
 
+  /**
+   * schema
+   * 
+   * @type Schema
+   */
   schema: Schema;
+
+  /**
+   * connection
+   * 
+   * @type Connection
+   */
   connection: Connection;
 
+  /**
+   * _models
+   * 
+   * @type any
+   */
   private _models: any;
+
+  /**
+   * _logger
+   * 
+   * @type Function
+   */
   private _logger: Function;
 
+  /**
+   * contructor
+   * @param schema {Schema} 
+   * @param models {any}
+   * @param connection {Connection}
+   * @param logger {Function}
+   */
   constructor(schema: Schema, models: any, connection: Connection, logger: Function) {
     this.schema = schema;
     this._models = models;
@@ -26,6 +112,13 @@ class Model {
     this._generate_methods();
   }
 
+  /**
+   * _check_if_password_type
+   * 
+   * @param field {string}
+   * 
+   * @returns boolean
+   */
   private _check_if_password_type(field: string): boolean {
     const _field = this.schema.original[field];
 
@@ -44,6 +137,14 @@ class Model {
     return false;
   }
 
+  /**
+   * checkPassword
+   * @param uid {string}
+   * @param field {string}
+   * @param password {string}
+   * 
+   * @returns Promise<new>
+   */
   async checkPassword(uid: string, field: string, password: string): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
       try {
@@ -70,6 +171,11 @@ class Model {
     });
   }
 
+  /**
+   * _generate_methods
+   * 
+   * @returns void
+   */
   private _generate_methods(): void {
     Object.keys(methods).forEach(_method => {
       Model.prototype[_method] = function(field: string, value: any = null, params: any = null): Promise<any> {
@@ -78,6 +184,12 @@ class Model {
     });
   }
 
+  /**
+   * _execute
+   * @param query {string}
+   * 
+   * @returns Promise<new>
+   */
   private _execute(query: string): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
       const _txn = this.connection.client.newTxn();
@@ -95,6 +207,15 @@ class Model {
     })
   }
 
+  /**
+   * _method
+   * @param type {string}
+   * @param field {any}
+   * @param value {any}
+   * @param params {any}
+   * 
+   * @returns Promise<new>
+   */
   private async _method(type: string, field: any, value: any = null, params: any = null): Promise<any> {        
     if(type === methods.uid || type === methods.has) {
       params = value;
@@ -108,6 +229,12 @@ class Model {
     return this._execute(query.query);
   }
 
+  /**
+   * query
+   * @param query {string}
+   * 
+   * @returns Promise<new>
+   */
   async query(query: string): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
       const _txn: Txn = this.connection.client.newTxn();
@@ -126,6 +253,12 @@ class Model {
     });
   }
 
+  /**
+   * queryWithVars
+   * @param params {QueryParams}
+   * 
+   * @returns Promise<new> 
+   */
   async queryWithVars(params: QueryParams): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
       const _txn: Txn = this.connection.client.newTxn();
@@ -144,6 +277,12 @@ class Model {
     });
   }
 
+  /**
+   * _is_relation
+   * @param _key {string}
+   * 
+   * @returns boolean
+   */
   private _is_relation(_key: string): boolean {
     const _field = this.schema.original[_key];
 
@@ -154,7 +293,14 @@ class Model {
     return false;
   }
 
-  private _parse_mutation(mutation: any, name: any): {[index: string]: any} {
+  /**
+   * _parse_mutation
+   * @param mutation {any} 
+   * @param name {string}
+   * 
+   * @returns {[index: string]: any}
+   */
+  private _parse_mutation(mutation: any, name: string): {[index: string]: any} {
     let _mutation: {[index: string]: any} = {};
 
     Object.keys(mutation).forEach(_key => {
@@ -180,6 +326,12 @@ class Model {
     return _mutation;
   }
 
+  /**
+   * _create
+   * @param mutation {any}
+   * 
+   * @returns Promise<any> 
+   */
   private _create(mutation: any): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
       const _txn = this.connection.client.newTxn();
@@ -213,12 +365,25 @@ class Model {
     });
   }
 
+  /**
+   * create
+   * @param data {any}
+   * 
+   * @returns Promise<any>
+   */
   async create(data: any): Promise<any> {
     this._check_attributes(this.schema.original, Object.keys(data));
     const mutation = this._parse_mutation(data, this.schema.name);
     return this._create(mutation);
   }
 
+  /**
+   * _update
+   * @param mutation {any}
+   * @param uid {any}
+   * 
+   * @returns Promise<any>
+   */
   private _update(mutation: any, uid: any): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
       const _txn = this.connection.client.newTxn();
@@ -242,6 +407,13 @@ class Model {
     });
   }
 
+  /**
+   * update
+   * @param data {any}
+   * @param uid {any}
+   * 
+   * @returns Promise<any>
+   */
   async update(data: any, uid: any): Promise<any> {
 
     if(!uid) {
@@ -283,6 +455,12 @@ class Model {
     }
   }
 
+  /**
+   * _delete
+   * @param mutation {any}
+   * 
+   * @returns Promise<any>
+   */
   private _delete(mutation: any): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
       const _txn = this.connection.client.newTxn();
@@ -304,6 +482,13 @@ class Model {
     });
   }
 
+  /**
+   * delete 
+   * @param params {any}
+   * @param uid {any}
+   * 
+   * @returns Promise<any>
+   */
   async delete(params: any, uid: any = null): Promise<any> {
 
     if(!uid) {
@@ -380,6 +565,11 @@ class Model {
     }
   }
 
+  /**
+   * _get_unique_fields
+   * 
+   * @returns Array<string>
+   */
   private _get_unique_fields(): Array<string> {
     const _unique: Array<string> = [];
 
@@ -393,6 +583,13 @@ class Model {
     return _unique;
   }
 
+  /**
+   * _check_unique_values
+   * @param mutation {any}
+   * @param _txn {any}
+   * 
+   * @returns Promise<any>
+   */
   private async _check_unique_values(mutation: any, _txn: any): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
       const _unique = this._get_unique_fields();
@@ -424,7 +621,15 @@ class Model {
     });
   }
 
-  private _check_attributes(original: any, attributes: any, isUpdate: boolean = false){
+  /**
+   * _check_attributes
+   * @param original {any}
+   * @param attributes {any}
+   * @param isUpdate {boolean}
+   * 
+   * @returs void 
+   */
+  private _check_attributes(original: any, attributes: any, isUpdate: boolean = false): void {
     if(!attributes || attributes.length === 0) {
       return;
     }
@@ -438,8 +643,14 @@ class Model {
     }
   }
 
-  private _all_attributes(original: any) {
-    const _attrs = [];
+  /**
+   * _all_attributes
+   * @param original {any}
+   * 
+   * @return Array<string>
+   */
+  private _all_attributes(original: any): Array<string> {
+    const _attrs: Array<string> = [];
     for(let attr of Object.keys(original)) {
       if(original[attr].type === 'uid' || original[attr] === 'password' || original[attr].type === 'password') {
         continue;
@@ -450,7 +661,14 @@ class Model {
     return _attrs;
   }
  
-  private _validate(original:any , params: any = {}) {
+  /**
+   * _validate
+   * @param original {any} 
+   * @param params {any}
+   * 
+   * @returns Params
+   */
+  private _validate(original:any , params: Params = {}): Params {
     
     if(!params) {
       params = {};
