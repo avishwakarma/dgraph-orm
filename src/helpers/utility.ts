@@ -138,3 +138,26 @@ export const pluck = (arr: Array<any>, key: string): Array<any> => {
 
   return _data;
 }
+
+/**
+ * merge
+ * 
+ * @param data {any}
+ * @param keys {Array<string>}
+ * 
+ * @returns any
+ */
+export const merge: Function = (data: any, keys: Array<string>): any => {      
+  if(keys.length === 1 && typeof data[keys[0]] !== 'undefined') {
+    return data[keys[0]];
+  }
+
+  const _data: any = {};
+  keys.forEach((_key: string) => {
+    if(typeof data[_key] !== 'undefined') {
+      _data[_key] = data[_key];
+    }
+  });
+
+  return _data;
+}

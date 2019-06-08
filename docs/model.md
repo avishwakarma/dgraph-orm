@@ -187,6 +187,38 @@ To validate a password value on PASSWORD type field
 Model.checkPassword('0x1', 'password', 'p@ssw0rd');
 ```
 
+### relation
+
+The `realtion` root method to fetch the relationship data 
+
+```javascript
+/**
+ * realtion
+ * 
+ * @param uid {string}
+ * @param params {RelationParam}
+ * 
+ */
+
+// Single relation default attributes ['uid']
+Model.realtion('0x1', {
+  field: 'friend'
+});
+
+// Multiple relation default attributes ['uid']
+Model.realtion('0x1', {
+  field: ['friend', 'location']
+});
+
+// With attributes
+Model.realtion('0x1', {
+  field: 'friend' // string | Array<string>
+  attributes: {
+    friend: ['uid', 'name']
+  }
+});
+```
+
 ### has
 
 The `has` root method of dgraph 
@@ -563,6 +595,30 @@ Model.has('email', {
   filter: {
     age: {
       $gt: 25
+    }
+  }
+})
+```
+
+#### uid_in
+
+Filter by edges (relationships)
+
+```javascript
+// One UID
+Model.has('email', {
+  filter: {
+    friend: {
+      $uid_in: '0x1'
+    }
+  }
+});
+
+// multiple UIDs
+Model.has('email', {
+  filter: {
+    friend: {
+      $uid_in: ['0x1', '0x2']
     }
   }
 })

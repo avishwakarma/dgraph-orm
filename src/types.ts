@@ -34,7 +34,8 @@ export interface FieldProps {
   count?: Boolean
   lang?: boolean
   model?: string
-  reverse?: boolean
+  reverse?: boolean,
+  replace?: boolean
 }
 
 export interface QueryParams {
@@ -72,6 +73,12 @@ export interface MethodsType {
   contains: string
 }
 
+export interface RelationParam {
+  field: string | Array<string>
+  attributes?: {
+    [key: string]: Array<string>
+  }
+}
 
 export interface Filter {
   [key: string]: any

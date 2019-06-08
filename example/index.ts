@@ -40,8 +40,24 @@ dgraph.connect({
    * @default grpc.credentials.createInsecure()
    * 
    */
-  credentails: grpc.credentials.createInsecure()
+  credentails: grpc.credentials.createInsecure(),
+
+  /**
+   * debug
+   * 
+   * set debug mode
+   * 
+   * @default false
+   */
+  debug: false
 });
+
+/**
+ * logging
+ * 
+ * Set your own logger Function
+ */
+dgraph.logging(console.log);
 
 /**
  * dgraph.Schema
@@ -64,6 +80,7 @@ const UserSchema = new dgraph.Schema('user', {
   name: {
     type: dgraph.Types.STRING,
     index: true,
+    lang: true,
     token: {
       term: true,
       trigram: true
@@ -114,8 +131,12 @@ const UserSchema = new dgraph.Schema('user', {
   friend: {
     type: dgraph.Types.UID,
     model: 'user',
-    count: true,
-    reverse: true
+    count: true
+  },
+  avatar: {
+    type: dgraph.Types.UID,
+    model: 'media',
+    replace: true
   }
 });
 
@@ -136,6 +157,13 @@ const PostSchema = new dgraph.Schema('post', {
 });
 
 const Post = dgraph.model(PostSchema);
+
+const MediaSchema = new dgraph.Schema('media', {
+  type: dgraph.Types.STRING,
+  src: dgraph.Types.STRING
+});
+
+const Media = dgraph.model(MediaSchema);
 
 /**
  * @example
@@ -179,11 +207,13 @@ const Post = dgraph.model(PostSchema);
   // await User.delete(['0x2']);
 
   // await User.update({
-  //   name: 'Parinita Sharma',
-  //   bio: 'Co Founder and COO, Impulsive Web Pvt. Ltd.'
-  // }, {
-  //   email: 'parinitashr413@gmail.com'
+  //   'name@fr': 'Parinita Sharma',
+  // }, '0x1');
+
+  // const pari = await User.uid('0x1', {
+  //   first: 1
   // });
+  // console.log(pari);
 
   // await User.update({
   //   name: 'Parinita Sharma',
@@ -226,19 +256,29 @@ const Post = dgraph.model(PostSchema);
   //   age: 32
   // }, '0x271c');
 
-  const users = await User.has('email');
+  // const users = await User.has('email');
 
-  const posts = await Post.has('title');
+  // const posts = await Post.has('title');
 
-  console.log(users);
-  console.log(posts);
+  // console.log(users);
+  // console.log(posts);
 
-  // User.delete({
-  //   email: 'akvlko@gmail.com'
+  // await Media.create({
+  //   type: 'image',
+  //   src: 'https://miro.medium.com/max/3150/1*RJuEp_08DylEspADBgsHoQ.jpeg'
   // });
 
-  // await User.delete({
-  //   email: 'test@gmail.com'
-  // });
+  // const _isDeleted = await Media.has('src');
+
+  // console.log(_isDeleted);
+
+  const user = await User.relation('0x2711', {
+    field: 'friend',
+    attributes: {
+      friend: ['uid', 'name']
+    }
+  });
+
+  console.log(user);
 
 })();

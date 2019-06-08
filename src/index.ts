@@ -69,7 +69,7 @@ class DgraphORM {
    * @type Function
    * Methods for logging
    */
-  private _logger: Function = console.log;
+  private _logger: Function = () => {};
 
   /**
    * connection
@@ -163,12 +163,12 @@ class DgraphORM {
    * 
    * @param schema {Array<string>}
    * 
-   * @returns Promise<any>
+   * @returns void
    */
   async _generate_schema(schema: Array<string>): Promise<any> {
     const op: Operation  = new this.connection.dgraph.Operation();
     op.setSchema(schema.join("\n"));
-    await this.connection.client.alter(op);
+    this.connection.client.alter(op).catch(error => {});
   }
 
   /**

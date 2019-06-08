@@ -28,6 +28,7 @@
     * [update](model?id=update)
     * [delete](model?id=delete)
     * [checkPassword](model?id=checkPassword)
+    * [relation](model?id=relation)
     * [has](model?id=has)
     * [eq](model?id=eq)
     * [uid](model?id=uid)

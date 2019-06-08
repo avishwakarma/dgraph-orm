@@ -25,7 +25,7 @@ import methods from './helpers/methods';
  * 
  * pluck utility method
  */
-import { pluck } from './helpers/utility';
+import { pluck, merge } from './helpers/utility';
 
 /**
  * Schema
@@ -41,7 +41,7 @@ import Schema from './schema';
  */
 import Connection from './connection';
 
-import { QueryParams, FieldProps, Params } from './types';
+import { QueryParams, FieldProps, Params, RelationParam } from './types';
 
 /**
  * Mutation
@@ -56,6 +56,7 @@ import { Mutation } from 'dgraph-js/generated/api_pb';
  * Type Txn from dgraph-js
  */
 import { Txn } from 'dgraph-js';
+import Types from './helpers/types';
 
 /**
  * Model
@@ -110,6 +111,57 @@ class Model {
     this._logger = logger;
 
     this._generate_methods();
+  }
+
+  async relation(uid: string, params: RelationParam): Promise<any> {
+
+    if(!params.field || (Array.isArray(params.field) && params.field.length === 0)) {
+      return null;
+    }
+
+    if(typeof params.field === 'string') {
+      params.field = [params.field]
+    }
+
+    this._check_attributes(this.schema.original, params.field, true, true);
+
+    const _include: any = {};
+    
+    params.field.map((_field: string) => {
+      _include[_field] = {
+        as: _field
+      }
+    })
+
+    const _user = await this._method('uid', uid, {
+      include: _include
+    });
+
+    let _data: any = null;
+
+    if(params.field.length === 1 && _user[0][params.field[0]] && _user[0][params.field[0]].length > 0) {
+      const _attributes = params.attributes && params.attributes[params.field[0]] ? params.attributes[params.field[0]] : ['uid'];
+      _data = _user[0][params.field[0]].map((_relation: any) => {
+        return merge(_relation, _attributes);
+      });
+      
+    } else {
+      _data = {};
+      params.field.forEach((_field: string) => {
+        const _attributes = params.attributes && params.attributes[_field] ? params.attributes[_field] : ['uid'];
+        if(!_user[0][_field]) {
+          _data[_field] = null;
+        } else {
+          _data[_field] = _user[0][_field].map((_relation: any) => {
+             return merge(_relation, _attributes);
+          });
+        }
+      });
+    }
+
+    return new Promise((resolve: Function) => {
+      return resolve(_data);
+    });
   }
 
   /**
@@ -192,11 +244,10 @@ class Model {
    */
   private _execute(query: string): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
-      const _txn = this.connection.client.newTxn();
+      const _txn: Txn = this.connection.client.newTxn();
 
       try {
         const res = await _txn.query(query);
-        // await _txn.commit();
         return resolve(res.getJson()[this.schema.name]);
       } catch (error) {
         await _txn.discard();
@@ -221,10 +272,10 @@ class Model {
       params = value;
       value = field;
     }
-
-    params = this._validate(this.schema.original, params);
     
-    const query = new Query(type, field, value, params, this.schema.name, this._logger);
+    const _params: any = this._validate(this.schema.original, params);
+    
+    const query: Query = new Query(type, field, value, _params, this.schema.name, this._logger);
 
     return this._execute(query.query);
   }
@@ -334,7 +385,7 @@ class Model {
    */
   private _create(mutation: any): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
-      const _txn = this.connection.client.newTxn();
+      const _txn: Txn = this.connection.client.newTxn();
 
       try {
         const mu: Mutation = new this.connection.dgraph.Mutation();
@@ -386,14 +437,14 @@ class Model {
    */
   private _update(mutation: any, uid: any): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
-      const _txn = this.connection.client.newTxn();
+      const _txn: Txn = this.connection.client.newTxn();
 
       try {
-        const mu = new this.connection.dgraph.Mutation();
+        const mu: Mutation = new this.connection.dgraph.Mutation();
         mutation.uid = uid;
         mu.setCommitNow(true);
         mu.setIgnoreIndexConflict(true);
-
+        
         mu.setSetJson(mutation);
         
         await _txn.mutate(mu);
@@ -420,37 +471,44 @@ class Model {
       return;
     }
 
-    if(Object.keys(data).length === 0) {
+    const _keys: Array<string> = Object.keys(data);
+
+    if(_keys.length === 0) {
       return;
     }
 
-    this._check_attributes(this.schema.original, Object.keys(data), true);
+    this._check_attributes(this.schema.original, _keys, true);
     const mutation = this._parse_mutation(data, this.schema.name);
+
+    let _delete: any = null;
+
+    Object.keys(data).forEach(async (_key: string) => {
+      _delete = {};
+      if(this.schema.original[_key].replace) {
+        _delete[`${this.schema.name}.${_key}`] = null;
+      }
+    });
+
+    if(_delete) {
+      _delete.uid = uid;
+      await this._delete(_delete);
+    }
 
     if(typeof uid === 'string') {
       return this._update(mutation, uid);
     }
 
     if(typeof uid === 'object') {
-      const _keys = Object.keys(uid);
-      const _first = _keys.splice(0, 1)[0];
-
-      const _filter: {[index: string]: any} = {};
-
-      if(_keys.length > 0) {
-        _keys.forEach(_key => {
-          _filter[_key] = {
-            $eq: uid[_key]
-          }
-        });
-      }
-      
-      const data: any = await this._method('eq', _first, uid[_first], {
-        filter: _filter
+      const _key: string = Object.keys(uid)[0];
+      const data: any = await this._method('has', _key, {
+        filter: uid
       });
 
       if(data.length > 0) {
-        this._update(mutation, data[0].uid);
+        const _uids: Array<string> = pluck(data, 'uid');
+        _uids.forEach(async (_uid: string) => {
+          await this._update(mutation, _uid);
+        });
       }
     }
   }
@@ -540,9 +598,13 @@ class Model {
             });
             _params[`${this.schema.name}.${_key}`] = _a;
           }else {
-            _params[`${this.schema.name}.${_key}`] = {
-              uid: params[_key]
-            };
+            if(this.schema.original[_key].replace) {
+              _params[`${this.schema.name}.${_key}`] = null
+            } else {
+              _params[`${this.schema.name}.${_key}`] = {
+                uid: params[_key]
+              };
+            }
           }
         }else {
           _params[`${this.schema.name}.${_key}`] = null;
@@ -622,22 +684,47 @@ class Model {
   }
 
   /**
+   * _lang_fields
+   * @param original {any}
+   * 
+   * @returns Array<string>
+   */
+  private _lang_fields(original: any): Array<string> {
+    const _fields: Array<string> = [];
+
+    Object.keys(original).forEach((_key: string) => {
+      if(original[_key].type === Types.STRING && original[_key].lang) {
+        _fields.push(_key);
+      }
+    });
+
+    return _fields;
+  }
+
+  /**
    * _check_attributes
    * @param original {any}
    * @param attributes {any}
    * @param isUpdate {boolean}
+   * @param isRelation {boolean}
    * 
    * @returs void 
    */
-  private _check_attributes(original: any, attributes: any, isUpdate: boolean = false): void {
+  private _check_attributes(original: any, attributes: any, isUpdate: boolean = false, isRelation: boolean = false): void {
     if(!attributes || attributes.length === 0) {
       return;
     }
 
+    const _lang_fields: Array<string> = this._lang_fields(original);
+
     for(let attribute of attributes) {
-      if(typeof original[attribute] === 'undefined') {
+      if(attribute.indexOf('@') === -1 && typeof original[attribute] === 'undefined') {
         throw new Error(`${this.schema.name} has no attribute ${attribute}`);
-      }else if(typeof original[attribute] === 'object' && original[attribute].type === 'uid' && !isUpdate) {
+      }else if(attribute.indexOf('@') !== -1 && _lang_fields.indexOf(attribute.split('@')[0]) === -1) {
+        throw new Error(`${this.schema.name} has no lang property in ${attribute}`);
+      }else if(typeof original[attribute] === 'object' && original[attribute].type !== 'uid' && isRelation) {
+        throw new Error(`${attribute} is not a relation.`);
+      } else if(typeof original[attribute] === 'object' && original[attribute].type === 'uid' && !isUpdate){
         throw new Error(`${attribute} is a realtion and must be in include.`);
       }
     }
