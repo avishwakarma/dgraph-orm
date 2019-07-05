@@ -423,7 +423,7 @@ class Model {
    * @returns Promise<any>
    */
   async create(data: any): Promise<any> {
-    this._check_attributes(this.schema.original, Object.keys(data));
+    this._check_attributes(this.schema.original, data, true);
     const mutation = this._parse_mutation(data, this.schema.name);
     return this._create(mutation);
   }
@@ -477,7 +477,7 @@ class Model {
       return;
     }
 
-    this._check_attributes(this.schema.original, _keys, true);
+    this._check_attributes(this.schema.original, data, true);
     const mutation = this._parse_mutation(data, this.schema.name);
 
     let _delete: any = null;
@@ -549,6 +549,8 @@ class Model {
    */
   async delete(params: any, uid: any = null): Promise<any> {
 
+    this._check_attributes(this.schema.original, params, true);
+
     if(!uid) {
       if(typeof params === 'string') {
         return this._delete({
@@ -585,8 +587,6 @@ class Model {
     }else {
       let _params: {[index: string]: any} = {};
 
-      this._check_attributes(this.schema.original, Object.keys(params), true);
-
       for(let _key of Object.keys(params)) {
         if(this._is_relation(_key)) {
           if(Array.isArray(params[_key])) {
@@ -598,6 +598,7 @@ class Model {
             });
             _params[`${this.schema.name}.${_key}`] = _a;
           }else {
+            console.log("here")
             if(this.schema.original[_key].replace) {
               _params[`${this.schema.name}.${_key}`] = null
             } else {
@@ -611,18 +612,20 @@ class Model {
         }
       }
 
-      if(Array.isArray(uid)) {
-        const _p: any = [];
-        uid.forEach(_uid => {
-          _params.uid = _uid;
-          _p.push(_params);
-        });
+      console.log(_params);
 
-        return this._delete(_p);
-      }
+      // if(Array.isArray(uid)) {
+      //   const _p: any = [];
+      //   uid.forEach(_uid => {
+      //     _params.uid = _uid;
+      //     _p.push(_params);
+      //   });
 
-      _params.uid = uid;
-      return this._delete(_params);
+      //   return this._delete(_p);
+      // }
+
+      // _params.uid = uid;
+      // return this._delete(_params);
 
     }
   }
@@ -710,7 +713,15 @@ class Model {
    * 
    * @returs void 
    */
-  private _check_attributes(original: any, attributes: any, isUpdate: boolean = false, isRelation: boolean = false): void {
+  private _check_attributes(original: any, data: any, isUpdate: boolean = false, isRelation: boolean = false): void {
+    let attributes: Array<string> = data;
+    let haveData: boolean = false;
+
+    if(!Array.isArray(data)) {
+      attributes = Object.keys(data);
+      haveData = true;
+    }
+    
     if(!attributes || attributes.length === 0) {
       return;
     }
@@ -726,7 +737,9 @@ class Model {
         throw new Error(`${attribute} is not a relation.`);
       } else if(typeof original[attribute] === 'object' && original[attribute].type === 'uid' && !isUpdate){
         throw new Error(`${attribute} is a realtion and must be in include.`);
-      }
+      } else if(typeof original[attribute] === 'object' && original[attribute].replace && haveData && Array.isArray(data[attribute])) {
+        throw new Error(`The value of ${attribute} cannot be an array as it has replace set to true.`);
+      } 
     }
   }
 

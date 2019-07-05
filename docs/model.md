@@ -106,6 +106,18 @@ Model.create({
   name: 'Ashok',
   email: 'akvlko@gmail.com'
 });
+
+/**
+ * create with relation
+ * 
+ * @param param {any}
+ * @retuns Promise<any>
+ */
+Model.create({
+  name: 'Ashok',
+  email: 'akvlko@gmail.com',
+  friend: ['0x1', '0x2']
+});
 ```
 
 ### update

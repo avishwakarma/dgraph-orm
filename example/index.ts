@@ -152,7 +152,8 @@ const PostSchema = new dgraph.Schema('post', {
   content: dgraph.Types.STRING,
   author: {
     type: dgraph.Types.UID,
-    model: 'user'
+    model: 'user',
+    replace: true
   }
 });
 
@@ -272,13 +273,29 @@ const Media = dgraph.model(MediaSchema);
 
   // console.log(_isDeleted);
 
-  const user = await User.relation('0x2711', {
-    field: 'friend',
-    attributes: {
-      friend: ['uid', 'name']
-    }
-  });
+  // const user = await User.relation('0x2711', {
+  //   field: 'friend',
+  //   attributes: {
+  //     friend: ['uid', 'name']
+  //   }
+  // });
 
-  console.log(user);
+  // console.log(user);
+
+  // await Post.delete({
+  //   author: '0x1'
+  // }, '0xc351');
+
+  // await Post.update({
+  //   author: '0x1'
+  // }, '0x9c42');
+
+  // const post = await Post.create({
+  //   title: 'A new sample post',
+  //   content: '<p>Sample content</p>',
+  //   author: '0x1'
+  // })
+
+  // console.log(post);
 
 })();
