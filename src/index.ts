@@ -202,8 +202,9 @@ class DgraphORM {
    * 
    * @returns void
    */
-  connect(config: ConnectionConfig): void {
+  connect(config: ConnectionConfig): Connection  {
     this.connection = this._create_connection(config);
+    return this.connection;
   }
 
   /**

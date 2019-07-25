@@ -16,6 +16,12 @@
  */
 import Schema from './schema';
 /**
+ * Connection
+ *
+ * dgraph-orm Connection class
+ */
+import Connection from './connection';
+/**
  * Model
  *
  * dgraph-orm Model class
@@ -132,7 +138,7 @@ declare class DgraphORM {
      *
      * @returns void
      */
-    connect(config: ConnectionConfig): void;
+    connect(config: ConnectionConfig): Connection;
     /**
      * query
      *
