@@ -199,8 +199,8 @@ const Media = dgraph.model(MediaSchema);
 
 (async () => {
   // const user = await User.create({
-  //   name: 'Mohit Talwar',
-  //   email: 'mohit@gmail.com',
+  //   name: 'Someone',
+  //   email: 'someone@gmail.com',
   //   bio: 'Performance and load tester',
   //   password: 'p@ssw0rd'
   // });
@@ -297,5 +297,9 @@ const Media = dgraph.model(MediaSchema);
   // })
 
   // console.log(post);
+
+  // await User.delete({
+  //   name: null
+  // }, '0xea63');
 
 })();

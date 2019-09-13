@@ -549,7 +549,9 @@ class Model {
    */
   async delete(params: any, uid: any = null): Promise<any> {
 
-    this._check_attributes(this.schema.original, params, true);
+    if(typeof params === 'object' && !Array.isArray(params)) {
+      this._check_attributes(this.schema.original, params, true);
+    }
 
     if(!uid) {
       if(typeof params === 'string') {
@@ -584,7 +586,7 @@ class Model {
 
         return this.delete(pluck(_data, 'uid'));
       }
-    }else {
+    } else {
       let _params: {[index: string]: any} = {};
 
       for(let _key of Object.keys(params)) {
@@ -598,7 +600,6 @@ class Model {
             });
             _params[`${this.schema.name}.${_key}`] = _a;
           }else {
-            console.log("here")
             if(this.schema.original[_key].replace) {
               _params[`${this.schema.name}.${_key}`] = null
             } else {
@@ -611,8 +612,6 @@ class Model {
           _params[`${this.schema.name}.${_key}`] = null;
         }
       }
-
-      console.log(_params);
 
       // if(Array.isArray(uid)) {
       //   const _p: any = [];
