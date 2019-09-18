@@ -481,15 +481,17 @@ class Model {
     const mutation = this._parse_mutation(data, this.schema.name);
 
     let _delete: any = null;
+    let _isDelete: boolean = false;
 
-    Object.keys(data).forEach(async (_key: string) => {
+    Object.keys(data).forEach((_key: string) => {
       _delete = {};
       if(this.schema.original[_key].replace) {
+        _isDelete = true;
         _delete[`${this.schema.name}.${_key}`] = null;
       }
     });
 
-    if(_delete) {
+    if(_isDelete) {
       _delete.uid = uid;
       await this._delete(_delete);
     }
