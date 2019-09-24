@@ -1,6 +1,6 @@
 {
   "name": "dgraph-orm",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Simplified schema creation, queries and mutations for Dgraph.",
   "main": "lib/index.js",
   "scripts": {

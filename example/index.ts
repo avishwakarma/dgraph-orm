@@ -154,6 +154,11 @@ const PostSchema = new dgraph.Schema('post', {
     type: dgraph.Types.UID,
     model: 'user',
     replace: true
+  },
+  banner: {
+    type: dgraph.Types.UID,
+    model: 'media',
+    replace: true
   }
 });
 
@@ -330,5 +335,32 @@ const Media = dgraph.model(MediaSchema);
   // await User.update({
   //   avatar: '0x7533'
   // }, '0x1');
+
+  // const posts = await Post.has('')
+
+  // await Post.update({
+  //   banner: '0x7533'
+  // }, '0xc353');
+
+  const posts = await Post.uid('0x9c41', {
+    include: {
+      author: {
+        as: 'author',
+        include: {
+          friend: {
+            as: 'friends'
+          },
+          avatar: {
+            as: 'avatar'
+          }
+        },
+      },
+      banner: {
+        as: 'banner'
+      }
+    }
+  });
+
+  console.log(posts);
 
 })();

@@ -275,6 +275,7 @@ class Query {
     }
 
     for(let relation of Object.keys(include)) {
+
       if(include[relation].count) {
         _inc += `${include[relation].as ? include[relation].as : relation}: count(${name}.${relation})`;
         continue;
@@ -297,11 +298,9 @@ class Query {
         _inc += ` (${_order})`;
       }
 
-      name = include[relation].model;
-
       _inc += `{
         ${this._attributes(include[relation].attributes, include[relation].model)}
-        ${this._include(include[relation].include, name)}
+        ${this._include(include[relation].include, include[relation].model)}
       }`
     }
 
