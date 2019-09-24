@@ -234,8 +234,8 @@ const Media = dgraph.model(MediaSchema);
   // console.log(_check);
 
   // await User.update({
-  //   friend: ['0x1', '0x2711']
-  // }, '0x271c');
+  //   friend: ['0x1']
+  // }, '0x13881');
 
   // await User.delete({
   //   friend: ['0x271c', '0x2711']
@@ -301,5 +301,34 @@ const Media = dgraph.model(MediaSchema);
   // await User.delete({
   //   name: null
   // }, '0xea63');
+
+  // const user = await User.has('friend', {
+  //   include: {
+  //     friend: {
+  //       as: 'friends',
+  //       include: {
+  //         friend: {
+  //           as: 'friends',
+  //           include: {
+  //             friend: {
+  //               as: 'friends',
+  //             }
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // });
+
+  // console.log(user);
+
+  // await Media.create({
+  //   src: 'myname.jpg',
+  //   type :'image'
+  // });
+
+  // await User.update({
+  //   avatar: '0x7533'
+  // }, '0x1');
 
 })();

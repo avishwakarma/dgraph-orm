@@ -267,7 +267,7 @@ class Query {
    * 
    * @returns string
    */
-  private _include(include: Include): string {
+  private _include(include: Include, name: string = this.name): string {
     let _inc: string = '';
 
     if(!include) {
@@ -276,11 +276,11 @@ class Query {
 
     for(let relation of Object.keys(include)) {
       if(include[relation].count) {
-        _inc += `${include[relation].as ? include[relation].as : relation}: count(${this.name}.${relation})`;
+        _inc += `${include[relation].as ? include[relation].as : relation}: count(${name}.${relation})`;
         continue;
       }
 
-      _inc += `${include[relation].as ? include[relation].as : relation}: ${this.name}.${relation}`;
+      _inc += `${include[relation].as ? include[relation].as : relation}: ${name}.${relation}`;
 
       const _limit: string = this._extras(include[relation]);
       const _order: string = this._parse_order(include[relation].order);
@@ -297,9 +297,11 @@ class Query {
         _inc += ` (${_order})`;
       }
 
+      name = include[relation].model;
+
       _inc += `{
         ${this._attributes(include[relation].attributes, include[relation].model)}
-        ${this._include(include[relation].include)}
+        ${this._include(include[relation].include, name)}
       }`
     }
 
