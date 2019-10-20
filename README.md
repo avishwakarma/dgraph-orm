@@ -7,6 +7,18 @@ Simplified schema creation, queries and mutations for Dgraph.
 npm install dgraph-orm
 ```
 
+Depending on the version of Dgraph that you are connecting to, you will have to
+use a different version.
+
+| Dgraph version | dgraph-orm version |
+|:--------------:|:-----------------:|
+|     1.0.X      |      *1.X.Y*      |
+|     1.1.X      |      *2.X.Y*      |
+
+Note: Only API breakage from *v1.X.Y* to *v2.X.Y* is in `dgraph-js` client
+function `DgraphClient.newTxn().mutate()`. This function returns a `messages.Assigned`
+type in *v1.X* but a `messages.Response` type in *v2.X*.
+
 ## Full Documentation
 
 https://ashokvishwakarma.github.io/dgraph-orm
@@ -49,7 +61,7 @@ const User = dgraph.model(UserSchema);
 
 /**
  * Creates a new user with passed fields
- * 
+ *
  * Returns the created user along with the generated uid
  */
 const user = await User.create({
