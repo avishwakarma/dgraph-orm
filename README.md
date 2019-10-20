@@ -11,13 +11,13 @@ Depending on the version of Dgraph that you are connecting to, you will have to
 use a different version.
 
 | Dgraph version | dgraph-orm version |
-|:--------------:|:-----------------:|
-|     1.0.X      |      *1.X.Y*      |
-|     1.1.X      |      *2.X.Y*      |
+| :------------: | :----------------: |
+|     1.0.X      |      _1.X.Y_       |
+|     1.1.X      |      _2.X.Y_       |
 
-Note: Only API breakage from *v1.X.Y* to *v2.X.Y* is in `dgraph-js` client
-function `DgraphClient.newTxn().mutate()`. This function returns a `messages.Assigned`
-type in *v1.X* but a `messages.Response` type in *v2.X*.
+Note: Only API breakage from _v1.X.Y_ to _v2.X.Y_ is in dependency -`dgraph-js`.
+Function `DgraphClient.newTxn().mutate()` returns a `messages.Assigned`
+type in _v1.X_ but a `messages.Response` type in _v2.X_.
 
 ## Full Documentation
 
