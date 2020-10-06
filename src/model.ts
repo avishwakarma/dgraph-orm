@@ -1,42 +1,42 @@
 /**
  * Model
- * 
+ *
  * dgraph-orm Model class
- * 
+ *
  * @author Ashok Vishwakarma <akvlko@gmail.com>
  */
 
 /**
  * Query
- * 
+ *
  * dgraph-orm Query class
  */
 import Query from './query';
 
 /**
  * methods
- * 
+ *
  * dgraph-orm model methods
  */
 import methods from './helpers/methods';
 
 /**
  * pluck
- * 
+ *
  * pluck utility method
  */
 import { pluck, merge } from './helpers/utility';
 
 /**
  * Schema
- * 
+ *
  * dgraph-orm Schema class
  */
 import Schema from './schema';
 
 /**
  * Connection
- * 
+ *
  * dgraph-orm Connection class
  */
 import Connection from './connection';
@@ -45,14 +45,14 @@ import { QueryParams, FieldProps, Params, RelationParam } from './types';
 
 /**
  * Mutation
- * 
+ *
  * Type Mutation from dgraph-js
  */
 import { Mutation } from 'dgraph-js/generated/api_pb';
 
 /**
  * Txn
- * 
+ *
  * Type Txn from dgraph-js
  */
 import { Txn } from 'dgraph-js';
@@ -60,7 +60,7 @@ import Types from './helpers/types';
 
 /**
  * Model
- * 
+ *
  * Class Model
  */
 class Model {
@@ -71,35 +71,35 @@ class Model {
 
   /**
    * schema
-   * 
+   *
    * @type Schema
    */
   schema: Schema;
 
   /**
    * connection
-   * 
+   *
    * @type Connection
    */
   connection: Connection;
 
   /**
    * _models
-   * 
+   *
    * @type any
    */
   private _models: any;
 
   /**
    * _logger
-   * 
+   *
    * @type Function
    */
   private _logger: Function;
 
   /**
    * contructor
-   * @param schema {Schema} 
+   * @param schema {Schema}
    * @param models {any}
    * @param connection {Connection}
    * @param logger {Function}
@@ -126,7 +126,7 @@ class Model {
     this._check_attributes(this.schema.original, params.field, true, true);
 
     const _include: any = {};
-    
+
     params.field.map((_field: string) => {
       _include[_field] = {
         as: _field
@@ -144,7 +144,7 @@ class Model {
       _data = _user[0][params.field[0]].map((_relation: any) => {
         return merge(_relation, _attributes);
       });
-      
+
     } else {
       _data = {};
       params.field.forEach((_field: string) => {
@@ -166,9 +166,9 @@ class Model {
 
   /**
    * _check_if_password_type
-   * 
+   *
    * @param field {string}
-   * 
+   *
    * @returns boolean
    */
   private _check_if_password_type(field: string): boolean {
@@ -194,7 +194,7 @@ class Model {
    * @param uid {string}
    * @param field {string}
    * @param password {string}
-   * 
+   *
    * @returns Promise<new>
    */
   async checkPassword(uid: string, field: string, password: string): Promise<any> {
@@ -225,7 +225,7 @@ class Model {
 
   /**
    * _generate_methods
-   * 
+   *
    * @returns void
    */
   private _generate_methods(): void {
@@ -239,7 +239,7 @@ class Model {
   /**
    * _execute
    * @param query {string}
-   * 
+   *
    * @returns Promise<new>
    */
   private _execute(query: string): Promise<any> {
@@ -264,17 +264,17 @@ class Model {
    * @param field {any}
    * @param value {any}
    * @param params {any}
-   * 
+   *
    * @returns Promise<new>
    */
-  private async _method(type: string, field: any, value: any = null, params: any = null): Promise<any> {        
+  private async _method(type: string, field: any, value: any = null, params: any = null): Promise<any> {
     if(type === methods.uid || type === methods.has) {
       params = value;
       value = field;
     }
-    
+
     const _params: any = this._validate(this.schema.original, params);
-    
+
     const query: Query = new Query(type, field, value, _params, this.schema.name, this._logger);
 
     return this._execute(query.query);
@@ -283,7 +283,7 @@ class Model {
   /**
    * query
    * @param query {string}
-   * 
+   *
    * @returns Promise<new>
    */
   async query(query: string): Promise<any> {
@@ -307,8 +307,8 @@ class Model {
   /**
    * queryWithVars
    * @param params {QueryParams}
-   * 
-   * @returns Promise<new> 
+   *
+   * @returns Promise<new>
    */
   async queryWithVars(params: QueryParams): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
@@ -331,7 +331,7 @@ class Model {
   /**
    * _is_relation
    * @param _key {string}
-   * 
+   *
    * @returns boolean
    */
   private _is_relation(_key: string): boolean {
@@ -346,9 +346,9 @@ class Model {
 
   /**
    * _parse_mutation
-   * @param mutation {any} 
+   * @param mutation {any}
    * @param name {string}
-   * 
+   *
    * @returns {[index: string]: any}
    */
   private _parse_mutation(mutation: any, name: string): {[index: string]: any} {
@@ -380,8 +380,8 @@ class Model {
   /**
    * _create
    * @param mutation {any}
-   * 
-   * @returns Promise<any> 
+   *
+   * @returns Promise<any>
    */
   private _create(mutation: any): Promise<any> {
     return new Promise(async (resolve: Function, reject: Function) => {
@@ -399,8 +399,7 @@ class Model {
         }
 
         mu.setCommitNow(true);
-        mu.setIgnoreIndexConflict(true);
-        
+
         const _mutation: any  = await _txn.mutate(mu);
 
         const _uid: any = _mutation.wrappers_[1].get('blank-0');
@@ -419,7 +418,7 @@ class Model {
   /**
    * create
    * @param data {any}
-   * 
+   *
    * @returns Promise<any>
    */
   async create(data: any): Promise<any> {
@@ -432,7 +431,7 @@ class Model {
    * _update
    * @param mutation {any}
    * @param uid {any}
-   * 
+   *
    * @returns Promise<any>
    */
   private _update(mutation: any, uid: any): Promise<any> {
@@ -443,10 +442,9 @@ class Model {
         const mu: Mutation = new this.connection.dgraph.Mutation();
         mutation.uid = uid;
         mu.setCommitNow(true);
-        mu.setIgnoreIndexConflict(true);
-        
+
         mu.setSetJson(mutation);
-        
+
         await _txn.mutate(mu);
         return resolve(true);
       } catch (error) {
@@ -462,7 +460,7 @@ class Model {
    * update
    * @param data {any}
    * @param uid {any}
-   * 
+   *
    * @returns Promise<any>
    */
   async update(data: any, uid: any): Promise<any> {
@@ -518,7 +516,7 @@ class Model {
   /**
    * _delete
    * @param mutation {any}
-   * 
+   *
    * @returns Promise<any>
    */
   private _delete(mutation: any): Promise<any> {
@@ -530,7 +528,7 @@ class Model {
         mu.setCommitNow(true);
         mu.setIgnoreIndexConflict(true);
         mu.setDeleteJson(mutation);
-        
+
         await _txn.mutate(mu);
         return resolve(true);
       } catch (error) {
@@ -543,10 +541,10 @@ class Model {
   }
 
   /**
-   * delete 
+   * delete
    * @param params {any}
    * @param uid {any}
-   * 
+   *
    * @returns Promise<any>
    */
   async delete(params: any, uid: any = null): Promise<any> {
@@ -561,7 +559,7 @@ class Model {
           uid: params
         });
       }
-  
+
       if(Array.isArray(params)) {
         const _uids = [];
         for(let _uid of params) {
@@ -569,7 +567,7 @@ class Model {
             uid: _uid
           });
         }
-  
+
         return this._delete(_uids);
       }
 
@@ -633,7 +631,7 @@ class Model {
 
   /**
    * _get_unique_fields
-   * 
+   *
    * @returns Array<string>
    */
   private _get_unique_fields(): Array<string> {
@@ -653,7 +651,7 @@ class Model {
    * _check_unique_values
    * @param mutation {any}
    * @param _txn {any}
-   * 
+   *
    * @returns Promise<any>
    */
   private async _check_unique_values(mutation: any, _txn: any): Promise<any> {
@@ -674,7 +672,7 @@ class Model {
           `{
            data (func: eq(${this.schema.name}.${_key}, ${_mvalue})) {
             ${_key}: ${this.schema.name}.${_key}
-           } 
+           }
           }`
         );
 
@@ -690,7 +688,7 @@ class Model {
   /**
    * _lang_fields
    * @param original {any}
-   * 
+   *
    * @returns Array<string>
    */
   private _lang_fields(original: any): Array<string> {
@@ -711,8 +709,8 @@ class Model {
    * @param attributes {any}
    * @param isUpdate {boolean}
    * @param isRelation {boolean}
-   * 
-   * @returs void 
+   *
+   * @returs void
    */
   private _check_attributes(original: any, data: any, isUpdate: boolean = false, isRelation: boolean = false): void {
     let attributes: Array<string> = data;
@@ -722,7 +720,7 @@ class Model {
       attributes = Object.keys(data);
       haveData = true;
     }
-    
+
     if(!attributes || attributes.length === 0) {
       return;
     }
@@ -740,14 +738,14 @@ class Model {
         throw new Error(`${attribute} is a realtion and must be in include.`);
       } else if(typeof original[attribute] === 'object' && original[attribute].replace && haveData && Array.isArray(data[attribute])) {
         throw new Error(`The value of ${attribute} cannot be an array as it has replace set to true.`);
-      } 
+      }
     }
   }
 
   /**
    * _all_attributes
    * @param original {any}
-   * 
+   *
    * @return Array<string>
    */
   private _all_attributes(original: any): Array<string> {
@@ -761,16 +759,16 @@ class Model {
 
     return _attrs;
   }
- 
+
   /**
    * _validate
-   * @param original {any} 
+   * @param original {any}
    * @param params {any}
-   * 
+   *
    * @returns Params
    */
   private _validate(original:any , params: Params = {}): Params {
-    
+
     if(!params) {
       params = {};
     }
@@ -780,11 +778,11 @@ class Model {
     }
 
     const _index = params.attributes.indexOf('uid');
-    
+
     if(_index !== -1) {
       params.attributes.splice(_index, 1);
     }
-    
+
     this._check_attributes(original, params.attributes);
 
     params.attributes.unshift('uid');

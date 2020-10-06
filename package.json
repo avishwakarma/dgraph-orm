@@ -1,6 +1,6 @@
 {
   "name": "dgraph-orm",
-  "version": "1.2.5",
+  "version": "2.0.0",
   "description": "Simplified schema creation, queries and mutations for Dgraph.",
   "main": "lib/index.js",
   "scripts": {
@@ -23,15 +23,15 @@
   },
   "homepage": "https://ashokvishwakarma.github.io/dgraph-orm",
   "devDependencies": {
-    "@types/google-protobuf": "^3.2.7",
-    "@types/node": "^12.0.2",
-    "nodemon": "^1.19.1",
-    "ts-node": "^8.1.0",
-    "typescript": "^3.4.5"
+    "@types/google-protobuf": "^3.7.2",
+    "@types/node": "^12.11.1",
+    "nodemon": "^1.19.4",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.4"
   },
   "dependencies": {
-    "dgraph-js": "^1.2.1",
-    "grpc": "^1.20.3",
+    "dgraph-js": "^2.0.2",
+    "grpc": "^1.24.0",
     "protobufjs": "^6.8.8"
   }
 }
