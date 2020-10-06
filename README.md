@@ -9,7 +9,7 @@ npm install dgraph-orm
 
 ## Full Documentation
 
-https://ashokvishwakarma.github.io/dgraph-orm
+https://avishwakarma.github.io/dgraph-orm
 
 ## Your first schema and model
 
